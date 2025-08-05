@@ -10,26 +10,85 @@ const firebaseConfig = {
   measurementId: "G-L9V5W9V0GE"
 };
 
+// --- LÓGICA DE CONTROLE DE ABAS (Broadcast Channel) ---
+
+// 1. Cria um "canal de rádio" privado para todas as abas desta página.
+const channel = new BroadcastChannel('estacao_meteorologica_channel');
+
+let isLeader = false; // Flag para saber se esta aba é a líder
+let leaderCheckTimeout;
+
+// 2. Lógica de Eleição de Líder
+function elegerLider() {
+  // Assume a liderança temporariamente
+  isLeader = true;
+  // Envia uma mensagem no canal dizendo "Estou assumindo a liderança!"
+  channel.postMessage({ type: 'CLAIM_LEADERSHIP' });
+  console.log("Esta aba está tentando se tornar a líder...");
+}
+
+// 3. O que fazer quando uma mensagem chega no canal
+channel.onmessage = (event) => {
+  // Se outra aba reivindicou a liderança ANTES de nós...
+  if (event.data.type === 'CLAIM_LEADERSHIP') {
+    console.log("Outra aba já é a líder. Esta aba será uma seguidora.");
+    // ...então esta aba não é a líder.
+    isLeader = false;
+    // Cancela nossa própria tentativa de nos tornarmos líder.
+    clearTimeout(leaderCheckTimeout);
+    // Mostra uma mensagem informativa no sumário
+    document.getElementById('summary-text').textContent = "Dados exibidos pela aba principal.";
+  }
+
+  // Se a aba líder enviar os dados, as abas seguidoras atualizam a página.
+  if (event.data.type === 'DATA_UPDATE') {
+    if (!isLeader) {
+      console.log("Dados recebidos da aba líder.", event.data.payload);
+      atualizarPagina(event.data.payload);
+    }
+  }
+};
+
+// 4. Inicia a eleição após um pequeno atraso aleatório
+// O atraso evita que duas abas abertas ao mesmo tempo tentem ser líder no exato mesmo instante.
+leaderCheckTimeout = setTimeout(elegerLider, Math.random() * 200 + 50);
+
+
+// --- LÓGICA DO FIREBASE (SÓ RODA SE A ABA FOR A LÍDER) ---
+
+// Inicializa o app do Firebase
 const app = firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 const latestDataRef = database.ref('dados').orderByKey().limitToLast(1);
 
-// Função principal que atualiza a página com os novos dados
+// Ouve por novos dados em tempo real
+latestDataRef.on('child_added', (snapshot) => {
+  // SÓ FAZ ALGO SE ESTA ABA FOR A LÍDER
+  if (isLeader) {
+    const latestData = snapshot.val();
+    console.log("Aba LÍDER recebeu novo dado do Firebase:", latestData);
+    
+    // Atualiza a própria página
+    atualizarPagina(latestData);
+    
+    // Envia os novos dados para as outras abas seguidoras através do canal
+    channel.postMessage({ type: 'DATA_UPDATE', payload: latestData });
+  }
+});
+
+
+// --- FUNÇÕES DE ATUALIZAÇÃO E CÁLCULO (sem alterações) ---
+
 function atualizarPagina(data) {
     if (!data) return;
-
-    // --- Dados do Firebase ---
     const temperatura = parseFloat(data.temperatura);
     const umidade = parseFloat(data.umidade);
     const pressao = parseFloat(data.pressao);
     const ventoKmh = parseFloat(data.velocidade_vento);
-
-    // --- Dados Calculados no Navegador ---
     const pontoDeOrvalho = calcularPontoOrvalho(temperatura, umidade);
     const sensacaoTermica = calcularSensacaoTermica(temperatura, umidade, ventoKmh);
-    const temperaturaInterna = (temperatura + 2.5).toFixed(1); // Simulação
+    const temperaturaInterna = (temperatura + 2.5).toFixed(1);
 
-    // --- Atualização dos Elementos HTML ---
     document.getElementById('temp-externa-valor').innerHTML = temperatura.toFixed(1) + '<span> &deg;C</span>';
     document.getElementById('umid-valor').innerHTML = umidade.toFixed(1) + '<span> %</span>';
     document.getElementById('pressao-valor').innerHTML = pressao ? pressao.toFixed(1) + '<span> hPa</span>' : '--<span> hPa</span>';
@@ -38,57 +97,34 @@ function atualizarPagina(data) {
     document.getElementById('data-hora').textContent = 'Última atualização: ' + data.timestamp;
     document.getElementById('temp-interna-valor').innerHTML = temperaturaInterna + '<span> &deg;C</span>';
     document.getElementById('ponto-orvalho-valor').innerHTML = pontoDeOrvalho + '<span> &deg;C</span>';
-    
-    // >>> ATUALIZAR O NOVO CARD DE SENSACÃO TÉRMICA <<<
     document.getElementById('sensacao-valor').innerHTML = sensacaoTermica + '<span> &deg;C</span>';
-
-    // --- Sumário do Tempo ---
+    
     const { texto, icone } = analisarCondicoes(temperatura, umidade, ventoKmh, pontoDeOrvalho);
     document.getElementById('summary-text').textContent = texto;
     document.getElementById('summary-icon').querySelector('svg').innerHTML = icone;
 }
 
-// Ouve por novos dados em tempo real
-latestDataRef.on('child_added', (snapshot) => {
-    const latestData = snapshot.val();
-    console.log("Novo dado recebido:", latestData);
-    atualizarPagina(latestData);
-});
-
-// --- FUNÇÕES AUXILIARES ---
-
 function calcularPontoOrvalho(temperatura, umidade) {
     if (isNaN(temperatura) || isNaN(umidade)) return '--';
-    const b = 17.625;
-    const c = 243.04;
+    const b = 17.625; const c = 243.04;
     const gama = Math.log(umidade / 100.0) + (b * temperatura) / (c + temperatura);
     const pontoOrvalho = (c * gama) / (b - gama);
     return pontoOrvalho.toFixed(1);
 }
 
-// >>> NOVA FUNÇÃO PARA CALCULAR A SENSACÃO TÉRMICA EM JAVASCRIPT <<<
 function calcularSensacaoTermica(tempC, umidade, ventoKmh) {
-    if (isNaN(tempC) || isNaN(umidade) || isNaN(ventoKmh)) {
-        return tempC.toFixed(1);
-    }
-
-    // Fator de Resfriamento (Wind Chill)
+    if (isNaN(tempC) || isNaN(umidade) || isNaN(ventoKmh)) return tempC.toFixed(1);
     if (tempC <= 10.0 && ventoKmh >= 4.8) {
         const vPow = Math.pow(ventoKmh, 0.16);
         const windChill = 13.12 + 0.6215 * tempC - 11.37 * vPow + 0.3965 * tempC * vPow;
         return windChill.toFixed(1);
     }
-
-    // Índice de Calor (Heat Index)
     if (tempC >= 27.0 && umidade >= 40.0) {
-        const T_f = (tempC * 1.8) + 32;
-        const RH = umidade;
+        const T_f = (tempC * 1.8) + 32; const RH = umidade;
         const HI_f = -42.379 + 2.04901523 * T_f + 10.14333127 * RH - 0.22475541 * T_f * RH - 0.00683783 * T_f * T_f - 0.05481717 * RH * RH + 0.00122874 * T_f * T_f * RH + 0.00085282 * T_f * RH * RH - 0.00000199 * T_f * T_f * RH * RH;
         const HI_c = (HI_f - 32) / 1.8;
         return HI_c.toFixed(1);
     }
-    
-    // Se nenhuma condição for atendida, a sensação é a própria temperatura
     return tempC.toFixed(1);
 }
 
@@ -96,8 +132,7 @@ function analisarCondicoes(temperatura, umidade, vento, pontoOrvalho) {
     const ICONE_SOL = '<path d="M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8M12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,11H22V13H20V11M2,11H4V13H2V11M11,2V4H13V2H11M11,20V22H13V20H11Z" />';
     const ICONE_NEBLINA = '<path d="M7,15H17A5,5 0 0,0 12,10A5,5 0 0,0 7,15M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M5,17H19A3,3 0 0,0 16,14A3,3 0 0,0 13,17H11A3,3 0 0,0 8,14A3,3 0 0,0 5,17Z" />';
     const ICONE_VENTO = '<path d="M9.5,12.5L12.5,15.5L11,17L8,14M14.5,12.5L11.5,15.5L13,17L16,14M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />';
-    
-    if (umidade > 95 && (temperatura - pontoOrvalho < 2.5)) {
+    if (umidade > 95 && (temperatura - parseFloat(pontoOrvalho) < 2.5)) {
         return { texto: "Neblina / Serração", icone: ICONE_NEBLINA };
     } else if (vento > 20) {
         return { texto: "Ventando Forte", icone: ICONE_VENTO };
