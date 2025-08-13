@@ -142,7 +142,7 @@ function analisarCondicoes(temperatura, umidade, vento, pontoOrvalho) {
             : { texto: "Tempo Quente", icone: ICONE_SOL };
     } else if (temperatura > 20) {
         return (umidade < 40)
-            ? { texto: "Ameno e Seco", icone: ICONE_SOL }
+            ? { texto: "Clima Ameno e Seco", icone: ICONE_SOL }
             : { texto: "Tempo Agradável", icone: ICONE_SOL };
     } else if (temperatura > 13) {
         return (umidade > 80)
@@ -171,3 +171,4 @@ function classificarPotencialEolico(ventoKmh) {
         return { texto: 'Calmo', cor: '#8a8d93' };
     }
 }
+
