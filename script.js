@@ -184,7 +184,7 @@ function classificarPotencialEolico(ventoKmh) {
 function preencherDescricoes(sumarioTexto, potencialTexto) {
     // Descrições estáticas
     document.getElementById('orvalho-descricao').textContent = "Temperatura na qual o ar fica 100% saturado e a água se condensa, formando orvalho ou neblina.";
-    document.getElementById('sensacao-descricao').textContent = "Percepção da temperatura pelo corpo humano, combinando temperatura, umidade e velocidade do vento.";
+    document.getElementById('sensacao-descricao').textContent = "Percepção da temperatura pelo corpo humano, combinando ar, umidade e vento.";
     document.getElementById('direcao-descricao').textContent = "Indica a direção de onde o vento está a soprar (ex: 'N' = Vento Norte).";
 
     // Descrições dinâmicas
