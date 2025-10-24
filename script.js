@@ -9,75 +9,151 @@ const firebaseConfig = {
   appId: "1:573048677136:web:86cae166c47daf024ebb95",
   measurementId: "G-SQXD1CTLX6"
 };
-// Inicializa o Firebase
-firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
+// --- LÓGICA DE CONTROLE DE ABAS (Broadcast Channel) ---
+const channel = new BroadcastChannel('estacao_meteorologica_channel');
+let isLeader = false;
+let leaderCheckTimeout;
 
-// --- ELEMENTOS DO HTML (VALORES PRINCIPAIS) ---
-const statusText = document.getElementById('status-text');
-const statusIcon = document.getElementById('status-icon');
+function elegerLider() {
+  isLeader = true;
+  channel.postMessage({ type: 'CLAIM_LEADERSHIP' });
+  console.log("Esta aba está tentando se tornar a líder...");
+  iniciarConexaoFirebase(); // Só o líder inicia a conexão
+}
 
-const tempValor = document.getElementById('temp-valor');
-const umidadeValor = document.getElementById('umidade-valor');
-const ventoValor = document.getElementById('vento-valor');
-const pressaoValor = document.getElementById('pressao-valor');
-
-// --- ELEMENTOS DO HTML (VALORES EXPANDIDOS) ---
-const tempSensacao = document.getElementById('temp-sensacao');
-const tempMax = document.getElementById('temp-max');
-const tempMin = document.getElementById('temp-min');
-const umidadeOrvalho = document.getElementById('umidade-orvalho');
-const ventoDirecao = document.getElementById('vento-direcao');
-const ventoMax = document.getElementById('vento-max');
-const pressaoTendencia = document.getElementById('pressao-tendencia');
-
-// --- CONEXÃO COM O FIREBASE (TEMPO REAL) ---
-const ultimoDadoRef = database.ref('dados').orderByKey().limitToLast(1);
-
-ultimoDadoRef.on('value', (snapshot) => {
-    if (snapshot.exists()) {
-        statusText.textContent = "Online";
-        statusIcon.className = 'online';
-
-        const ultimoDado = snapshot.val();
-        const chaveUnica = Object.keys(ultimoDado)[0];
-        const dados = ultimoDado[chaveUnica];
-
-        // 1. Atualiza os valores principais (os que estão sempre visíveis)
-        tempValor.textContent = `${parseFloat(dados.temperatura).toFixed(1)} °C`;
-        umidadeValor.textContent = `${parseFloat(dados.umidade).toFixed(0)} %`;
-        ventoValor.textContent = `${parseFloat(dados.velocidade_vento).toFixed(1)} km/h`;
-        pressaoValor.textContent = `${parseFloat(dados.pressao).toFixed(1)} hPa`;
-        
-        // 2. Atualiza os valores expandidos
-        // (Por agora, só preenchemos os que o ESP32 já envia)
-        ventoDirecao.textContent = dados.direcao_vento;
-        
-        // (Os dados de 'sensacao', 'max', 'min' virão do ESP32 no futuro)
-        // tempSensacao.textContent = `${parseFloat(dados.sensacao_termica).toFixed(1)} °C`;
-        // umidadeOrvalho.textContent = `${parseFloat(dados.ponto_orvalho).toFixed(1)} °C`;
-
-    } else {
-        statusText.textContent = "Nenhum dado";
-        statusIcon.className = 'offline';
+channel.onmessage = (event) => {
+  if (event.data.type === 'CLAIM_LEADERSHIP') {
+    if(isLeader) return; // Ignora a própria mensagem
+    console.log("Outra aba já é a líder. Esta aba será uma seguidora.");
+    isLeader = false;
+    clearTimeout(leaderCheckTimeout);
+    document.getElementById('summary-text').textContent = "Dados exibidos pela aba principal.";
+  }
+  if (event.data.type === 'DATA_UPDATE') {
+    if (!isLeader) {
+      console.log("Dados recebidos da aba líder.", event.data.payload);
+      atualizarPagina(event.data.payload);
     }
-}, (error) => {
-    console.error("Erro ao ler dados: ", error);
-    statusText.textContent = "Erro de Conexão";
-    statusIcon.className = 'offline';
-});
+  }
+};
+
+leaderCheckTimeout = setTimeout(elegerLider, Math.random() * 200 + 50);
+
+// --- LÓGICA DO FIREBASE ---
+function iniciarConexaoFirebase() {
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    
+    // Referência para o status da conexão
+    const statusRef = database.ref('.info/connected');
+    const statusText = document.getElementById('status-text');
+    const statusIcon = document.getElementById('status-icon');
+
+    // Referência para os dados
+    const latestDataRef = database.ref('dados').orderByKey().limitToLast(1);
+
+    // Ouvinte para o status da conexão
+    statusRef.on('value', (snapshot) => {
+        if (snapshot.val() === true) {
+            statusText.textContent = "Online";
+            statusIcon.className = 'online';
+            console.log("Conectado ao Firebase.");
+        } else {
+            statusText.textContent = "Offline";
+            statusIcon.className = 'offline';
+            console.log("Desconectado do Firebase.");
+        }
+    });
+
+    // Ouvinte para novos dados (child_added)
+    latestDataRef.on('child_added', (snapshot) => {
+        if (isLeader) {
+            const latestData = snapshot.val();
+            console.log("Aba LÍDER recebeu novo dado do Firebase:", latestData);
+            atualizarPagina(latestData);
+            channel.postMessage({ type: 'DATA_UPDATE', payload: latestData });
+        }
+    });
+}
+
+// --- FUNÇÕES DE ATUALIZAÇÃO E CÁLCULO ---
+function atualizarPagina(data) {
+    if (!data) return;
+
+    const temperatura = parseFloat(data.temperatura);
+    const umidade = parseFloat(data.umidade);
+    const pressao = parseFloat(data.pressao);
+    const ventoKmh = parseFloat(data.velocidade_vento);
+
+    const pontoDeOrvalho = calcularPontoOrvalho(temperatura, umidade);
+    const sensacaoTermica = calcularSensacaoTermica(temperatura, umidade, ventoKmh);
+    const { texto: potencialTexto, cor: potencialCor } = classificarPotencialEolico(ventoKmh);
+    
+    // Atualiza os valores principais (visíveis)
+    document.getElementById('temp-valor').innerHTML = temperatura.toFixed(1) + ' °C';
+    document.getElementById('umidade-valor').innerHTML = umidade.toFixed(0) + ' %';
+    document.getElementById('vento-valor').innerHTML = ventoKmh.toFixed(1) + ' km/h';
+    document.getElementById('pressao-valor').innerHTML = pressao ? pressao.toFixed(1) + ' hPa' : '-- hPa';
+
+    // Atualiza os valores expandidos (escondidos)
+    document.getElementById('sensacao-valor').innerHTML = sensacaoTermica + ' °C';
+    document.getElementById('umidade-orvalho').innerHTML = pontoDeOrvalho + ' °C';
+    document.getElementById('vento-direcao').textContent = data.direcao_vento;
+    
+    // (Lógica para o sumário, se você tiver)
+    // const { texto: sumarioTexto, icone } = analisarCondicoes(temperatura, umidade, ventoKmh, pontoDeOrvalho);
+    // document.getElementById('summary-text').textContent = sumarioTexto;
+    // document.getElementById('summary-icon').querySelector('svg').innerHTML = icone;
+}
+
+function calcularPontoOrvalho(temperatura, umidade) {
+    if (isNaN(temperatura) || isNaN(umidade)) return '--';
+    const b = 17.625; const c = 243.04;
+    const gama = Math.log(umidade / 100.0) + (b * temperatura) / (c + temperatura);
+    const pontoOrvalho = (c * gama) / (b - gama);
+    return pontoOrvalho.toFixed(1);
+}
+
+function calcularSensacaoTermica(tempC, umidade, ventoKmh) {
+    if (isNaN(tempC) || isNaN(umidade) || isNaN(ventoKmh)) return tempC.toFixed(1);
+    if (tempC <= 10.0 && ventoKmh >= 4.8) {
+        const vPow = Math.pow(ventoKmh, 0.16);
+        const windChill = 13.12 + 0.6215 * tempC - 11.37 * vPow + 0.3965 * tempC * vPow;
+        return windChill.toFixed(1);
+    }
+    if (tempC >= 27.0 && umidade >= 40.0) {
+        const T_f = (tempC * 1.8) + 32; const RH = umidade;
+        const HI_f = -42.379 + 2.04901523 * T_f + 10.14333127 * RH - 0.22475541 * T_f * RH - 0.00683783 * T_f * T_f - 0.05481717 * RH * RH + 0.00122874 * T_f * T_f * RH + 0.00085282 * T_f * RH * RH - 0.00000199 * T_f * T_f * RH * RH;
+        const HI_c = (HI_f - 32) / 1.8;
+        return HI_c.toFixed(1);
+    }
+    return tempC.toFixed(1);
+}
+
+// (As funções analisarCondicoes e classificarPotencialEolico não estão a ser usadas
+// no HTML/CSS atual, mas deixo-as aqui caso queira usá-las no futuro.)
+
+function classificarPotencialEolico(ventoKmh) {
+    if (isNaN(ventoKmh)) return { texto: '--', cor: '#e1e1e1' };
+    if (ventoKmh > 30) {
+        return { texto: 'Forte', cor: '#f0ad4e' };
+    } else if (ventoKmh > 15) {
+        return { texto: 'Moderado', cor: '#28a745' };
+    } else if (ventoKmh > 5) {
+        return { texto: 'Branda', cor: '#00bcd4' };
+    } else {
+        return { texto: 'Calmo', cor: '#8a8d93' };
+    }
+}
 
 
 // --- LÓGICA PARA TORNAR OS CARDS EXPANSÍVEIS ---
-// Esta função é executada assim que o HTML é carregado
 document.addEventListener('DOMContentLoaded', () => {
-
     // Seleciona TODOS os elementos que têm a classe ".card-header"
     const headers = document.querySelectorAll('.card-header');
 
     // Faz um loop por cada cabeçalho encontrado
     headers.forEach(header => {
-        
         // Adiciona um "ouvinte de clique" a este cabeçalho específico
         header.addEventListener('click', () => {
             // Encontra o elemento ".card" pai mais próximo
