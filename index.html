@@ -3,57 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estação Meteorológica - PUC Minas</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>Estação Meteorológica</title>
     <link rel="stylesheet" href="style.css">
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SQXD1CTLX6"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-SQXD1CTLX6');
-    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Dashboard Meteorológico</h1>
-            <h2 style="color: var(--secondary-color); font-weight: 300; font-size: 18px; margin: 5px 0 0 0;">
-                PUC Minas - Poços de Caldas
-            </h2>
-        </header>
-        
-        <div class='summary-card'>
-            <div class='summary-icon' id='summary-icon'>
-                <svg style="width:100%;height:100%" viewBox="0 0 24 24"></svg>
+
+    <header>
+        <h1>Estação Meteorológica</h1>
+        <div class="status">
+            <span id="status-text">Conectando...</span>
+            <div id="status-icon"></div>
+        </div>
+    </header>
+
+    <main class="grid-container">
+
+        <div class="card" id="temp-card">
+            <div class="card-header">
+                <div class="card-header-main">
+                    <h2>Temperatura</h2>
+                    <p id="temp-valor">-- °C</p>
+                </div>
+                <span class="card-arrow">▼</span>
             </div>
-            <h2 class='summary-text' id='summary-text'>Aguardando dados...</h2>
+            <div class="card-content">
+                <p>Sensação Térmica: <span id="temp-sensacao">-- °C</span></p>
+                <p>Máxima (24h): <span id="temp-max">-- °C</span></p>
+                <p>Mínima (24h): <span id="temp-min">-- °C</span></p>
+            </div>
         </div>
 
-        <main class='grid-container'>
-            <div class='card'><div class='card-icon'><svg style="width:100%;height:100%" viewBox="0 0 24 24"><path d="M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8M12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,11H22V13H20V11M2,11H4V13H2V11M11,2V4H13V2H11M11,20V22H13V20H11Z" /></svg></div><h3>Temp. Externa</h3><p class='value' id='temp-externa-valor'>--<span> &deg;C</span></p></div>
-            <div class='card'><div class='card-icon'><svg style="width:100%;height:100%" viewBox="0 0 24 24"><path d="M12,20A6,6 0 0,1 6,14C6,10 12,3.25 12,3.25C12,3.25 18,10 18,14A6,6 0 0,1 12,20M12,6.5A3.5,3.5 0 0,0 8.5,10A3.5,3.5 0 0,0 12,13.5A3.5,3.5 0 0,0 15.5,10A3.5,3.5 0 0,0 12,6.5Z" /></svg></div><h3>Umidade</h3><p class='value' id='umid-valor'>--<span> %</span></p></div>
-            <div class='card'><div class='card-icon'><svg style="width:100%;height:100%" viewBox="0 0 24 24"><path d="M12,16A3,3 0 0,1 9,13C9,11.63 10.25,9.2 12,5.5C13.75,9.2 15,11.63 15,13A3,3 0 0,1 12,16M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z" /></svg></div><h3>Ponto de Orvalho</h3><p class='value' id='ponto-orvalho-valor'>--<span> &deg;C</span></p></div>
-            <div class='card'><div class='card-icon'><svg style="width:100%;height:100%" viewBox="0 0 24 24"><path d="M10,4.5C10,5.91 10.5,7.17 11.3,8H6V6H5V10H6V9H8.2C8.1,9.32 8,9.66 8,10A5,5 0 0,0 13,15A5,5 0 0,0 18,10C18,7.24 15.76,5 13,5C12.3,5 11.6,5.1 11,5.3V4.5A2.5,2.5 0 0,0 8.5,2A2.5,2.5 0 0,0 6,4.5H5A3.5,3.5 0 0,1 8.5,1A3.5,3.5 0 0,1 12,4.5V5.05A7,7 0 0,1 19.95,12H21V13H19.95A7,7 0 0,1 13,19.95V21H12V19.95A7,7 0 0,1 6.05,13H4V12H6.05A7,7 0 0,1 10,6.05V4.5Z" /></svg></div><h3>Sensação</h3><p class='value' id='sensacao-valor'>--<span> &deg;C</span></p></div>
-            <div class='card'><div class='card-icon'><svg style="width:100%;height:100%" viewBox="0 0 24 24"><path d="M16,12V4H17V2H7V4H8V12H6L12,18L18,12H16M12,14.5L9,11.5V4H15V11.5L12,14.5Z" /></svg></div><h3>Pressão</h3><p class='value' id='pressao-valor'>--<span> hPa</span></p></div>
-            <div class='card'>
-                <div class='card-icon'><svg style="width:100%;height:100%" viewBox="0 0 24 24"><path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z" /></svg></div>
-                <h3>Potencial Eólico</h3>
-                <p class='value' id='potencial-eolico-valor' style="font-size: 24px;">--</p>
+        <div class="card" id="umidade-card">
+            <div class="card-header">
+                <div class="card-header-main">
+                    <h2>Umidade</h2>
+                    <p id="umidade-valor">-- %</p>
+                </div>
+                <span class="card-arrow">▼</span>
             </div>
-            <div class='card'><div class='card-icon'><svg style="width:100%;height:100%" viewBox="0 0 24 24"><path d="M9.5,12.5L12.5,15.5L11,17L8,14M14.5,12.5L11.5,15.5L13,17L16,14M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" /></svg></div><h3>Vel. Vento</h3><p class='value' id='vento-valor'>--<span> km/h</span></p></div>
-            <div class='card'><div class='card-icon'><svg style="width:100%;height:100%" viewBox="0 0 24 24"><path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z" /></svg></div><h3>Dir. Vento</h3><p class='value' id='dir-vento-valor'>--</p></div>
-        </main>
-        
-        <footer class='footer'><p id='data-hora'>--</p></footer>
-    </div>
+            <div class="card-content">
+                <p>Ponto de Orvalho: <span id="umidade-orvalho">-- °C</span></p>
+            </div>
+        </div>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+        <div class="card" id="vento-card">
+            <div class="card-header">
+                <div class="card-header-main">
+                    <h2>Vento</h2>
+                    <p id="vento-valor">-- km/h</p>
+                </div>
+                <span class="card-arrow">▼</span>
+            </div>
+            <div class="card-content">
+                <p>Direção: <span id="vento-direcao">--</span></p>
+                <p>Rajada Máxima (24h): <span id="vento-max">-- km/h</span></p>
+            </div>
+        </div>
 
+        <div class="card" id="pressao-card">
+            <div class="card-header">
+                <div class="card-header-main">
+                    <h2>Pressão</h2>
+                    <p id="pressao-valor">-- hPa</p>
+                </div>
+                <span class="card-arrow">▼</span>
+            </div>
+            <div class="card-content">
+                <p>Tendência (3h): <span id="pressao-tendencia">--</span></p>
+            </div>
+        </div>
+    </main>
+    
     <script src="script.js"></script>
 </body>
 </html>
