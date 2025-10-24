@@ -9,7 +9,6 @@ const firebaseConfig = {
   appId: "1:573048677136:web:86cae166c47daf024ebb95",
   measurementId: "G-SQXD1CTLX6"
 };
-
 // --- LÓGICA DE CONTROLE DE ABAS (Broadcast Channel) ---
 const channel = new BroadcastChannel('estacao_meteorologica_channel');
 let isLeader = false;
@@ -69,23 +68,37 @@ function atualizarPagina(data) {
     const sensacaoTermica = calcularSensacaoTermica(temperatura, umidade, ventoKmh);
     const { texto: potencialTexto, cor: potencialCor } = classificarPotencialEolico(ventoKmh);
     
+    // Atualiza os valores PRINCIPAIS (sempre visíveis)
     document.getElementById('temp-externa-valor').innerHTML = temperatura.toFixed(1) + '<span> &deg;C</span>';
     document.getElementById('umid-valor').innerHTML = umidade.toFixed(1) + '<span> %</span>';
     document.getElementById('ponto-orvalho-valor').innerHTML = pontoDeOrvalho + '<span> &deg;C</span>';
     document.getElementById('sensacao-valor').innerHTML = sensacaoTermica + '<span> &deg;C</span>';
     document.getElementById('pressao-valor').innerHTML = pressao ? pressao.toFixed(1) + '<span> hPa</span>' : '--<span> hPa</span>';
+    document.getElementById('vento-valor').innerHTML = ventoKmh.toFixed(1) + '<span> km/h</span>';
+    document.getElementById('dir-vento-valor').innerHTML = data.direcao_vento || '--';
     
     const potencialEolicoElement = document.getElementById('potencial-eolico-valor');
     potencialEolicoElement.textContent = potencialTexto;
     potencialEolicoElement.style.color = potencialCor;
     
-    document.getElementById('vento-valor').innerHTML = ventoKmh.toFixed(1) + '<span> km/h</span>';
-    document.getElementById('dir-vento-valor').textContent = data.direcao_vento;
     document.getElementById('data-hora').textContent = 'Última atualização: ' + data.timestamp;
 
     const { texto: sumarioTexto, icone } = analisarCondicoes(temperatura, umidade, ventoKmh, pontoDeOrvalho);
     document.getElementById('summary-text').textContent = sumarioTexto;
     document.getElementById('summary-icon').querySelector('svg').innerHTML = icone;
+
+    // Atualiza os valores EXPANDIDOS (escondidos)
+    preencherDescricoes(sumarioTexto, potencialTexto);
+    
+    // NOTA: Os dados de max/min ainda não são enviados pelo ESP32.
+    // O seu próximo passo será modificar o firmware para calcular e enviar
+    // "temp_max_dia", "temp_min_dia", "umid_max_dia", etc.
+    // Por enquanto, eles ficarão com "--".
+    
+    // Exemplo de como vai funcionar no futuro:
+    // if (data.temp_max_dia) {
+    //   document.getElementById('temp-max-dia').textContent = parseFloat(data.temp_max_dia).toFixed(1) + ' °C';
+    // }
 }
 
 function calcularPontoOrvalho(temperatura, umidade) {
@@ -112,7 +125,6 @@ function calcularSensacaoTermica(tempC, umidade, ventoKmh) {
     return tempC.toFixed(1);
 }
 
-// >>> AQUI ESTÁ A NOVA FUNÇÃO DE ANÁLISE, MAIS INTELIGENTE <<<
 function analisarCondicoes(temperatura, umidade, vento, pontoOrvalho) {
     // Ícones SVG
     const ICONE_SOL = '<path d="M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8M12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,11H22V13H20V11M2,11H4V13H2V11M11,2V4H13V2H11M11,20V22H13V20H11Z" />';
@@ -124,14 +136,10 @@ function analisarCondicoes(temperatura, umidade, vento, pontoOrvalho) {
     if (isNaN(temperatura) || isNaN(umidade)) {
         return { texto: "Erro nos Sensores", icone: ICONE_NEBLINA };
     }
-
-    // 1. Checa por condições especiais primeiro
     if (umidade > 95 && (temperatura - parseFloat(pontoOrvalho) < 2.5)) {
         return { texto: "Neblina / Serração", icone: ICONE_NEBLINA };
     } else if (vento > 35) {
         return { texto: "Ventania", icone: ICONE_VENTO };
-    
-    // 2. Se não houver, classifica pela temperatura e umidade
     } else if (temperatura > 32) {
         return (umidade > 60) 
             ? { texto: "Tórrido e Abafado", icone: ICONE_QUENTE_UMIDO } 
@@ -171,3 +179,60 @@ function classificarPotencialEolico(ventoKmh) {
         return { texto: 'Calmo', cor: '#8a8d93' };
     }
 }
+
+// --- FUNÇÃO PARA PREENCHER DESCRIÇÕES ESTÁTICAS ---
+function preencherDescricoes(sumarioTexto, potencialTexto) {
+    // Descrições estáticas
+    document.getElementById('orvalho-descricao').textContent = "Temperatura na qual o ar fica 100% saturado e a água se condensa, formando orvalho ou neblina.";
+    document.getElementById('sensacao-descricao').textContent = "Percepção da temperatura pelo corpo humano, combinando temperatura, umidade e velocidade do vento.";
+    document.getElementById('direcao-descricao').textContent = "Indica a direção de onde o vento está a soprar (ex: 'N' = Vento Norte).";
+
+    // Descrições dinâmicas
+    const descSumario = {
+        "Neblina / Serração": "Visibilidade reduzida. O ar está saturado de umidade e a temperatura é igual ao ponto de orvalho.",
+        "Ventania": "Ventos fortes. Risco de queda de objetos e poeira.",
+        "Tórrido e Abafado": "Calor extremo e muito úmido. Risco elevado de exaustão pelo calor.",
+        "Tórrido e Seco": "Calor extremo e ar muito seco. Risco de desidratação e problemas respiratórios.",
+        "Quente e Abafado": "Calor e umidade elevados. Desconfortável.",
+        "Tempo Quente": "Dia quente com umidade moderada.",
+        "Ameno e Seco": "Temperatura agradável, mas com baixa umidade no ar.",
+        "Tempo Agradável": "Condições ideais de temperatura e umidade.",
+        "Fresco e Úmido": "Tempo fresco com alta umidade, sensação de frio maior.",
+        "Tempo Fresco": "Temperatura amena, tendendo para o frio.",
+        "Frio e Úmido": "Frio com alta umidade, aumentando a sensação de frio.",
+        "Tempo Frio": "Tempo frio, mas com ar relativamente seco.",
+        "Muito Frio e Úmido": "Frio intenso e alta umidade. Risco de hipotermia em longas exposições.",
+        "Muito Frio": "Frio intenso. Agasalhe-se bem.",
+        "Erro nos Sensores": "Um dos sensores de temperatura ou umidade não está a enviar dados."
+    };
+    document.getElementById('summary-descricao').textContent = descSumario[sumarioTexto] || "Analisando...";
+
+    const descPotencial = {
+        'Forte': "Geração de energia significativa. Ventos acima de 30 km/h.",
+        'Moderado': "Bom potencial para geração de energia. Ventos entre 15 e 30 km/h.",
+        'Branda': "Potencial baixo, suficiente para pequenas turbinas. Ventos entre 5 e 15 km/h.",
+        'Calmo': "Sem potencial para geração de energia. Ventos abaixo de 5 km/h.",
+        '--': "Sem dados de vento para calcular."
+    };
+    document.getElementById('potencial-descricao').textContent = descPotencial[potencialTexto] || "--";
+}
+
+
+// --- LÓGICA PARA TORNAR OS CARDS EXPANSÍVEIS ---
+document.addEventListener('DOMContentLoaded', () => {
+    // Seleciona TODOS os elementos que têm a classe ".card"
+    const cards = document.querySelectorAll('.card');
+
+    cards.forEach(card => {
+        // Encontra o cabeçalho (.card-header) dentro de cada card
+        const header = card.querySelector('.card-header');
+        
+        if (header) {
+            // Adiciona um "ouvinte de clique" a este cabeçalho
+            header.addEventListener('click', () => {
+                // Adiciona ou remove a classe "expanded" do card pai
+                card.classList.toggle('expanded');
+            });
+        }
+    });
+});
