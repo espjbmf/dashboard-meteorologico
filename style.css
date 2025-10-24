@@ -32,8 +32,9 @@ header h1 { margin: 0; color: var(--primary-color); font-weight: 300; font-size:
 /* --- NOVOS ESTILOS PARA OS CARDS EXPANSÍVEIS --- */
 
 .card {
-    /* Remove a justificação que quebrava o layout */
-    justify-content: flex-start;
+    /* Ajusta o padding e remove o justify-content para a expansão funcionar */
+    padding: 20px;
+    justify-content: flex-start; 
 }
 
 /* O cabeçalho clicável (contém ícone, título, valor e seta) */
