@@ -55,32 +55,48 @@ header h1 {
     transition: background-color 0.3s ease;
 }
 
-/* --- ESTILOS DOS CARDS EXPANSÍVEIS --- */
+/* --- ESTILOS DOS CARDS EXPANSÍVEIS (DESIGN CORRETO) --- */
 
 /* O cabeçalho clicável */
 .card-header {
     display: flex;
     justify-content: space-between;
-    align-items: center; /* Alinha o bloco (título+valor) e a seta */
+    align-items: flex-start; /* Alinha no topo */
     cursor: pointer;
-    user-select: none; /* Evita que o texto seja selecionado ao clicar */
+    user-select: none; 
 }
 
-/* Bloco principal que mantém o design original */
-.card-header-main {
-    flex-grow: 1; /* Faz este bloco ocupar o espaço */
+.card-header-main { 
+    flex-grow: 1; 
 }
 
-/* ESTILO ORIGINAL: Título roxo */
-.card-header-main h2 {
-    margin-top: 0;
+/* Título (Ícone + Texto) */
+.card-title {
+    display: flex;
+    align-items: center;
     margin-bottom: 10px;
-    color: #bb86fc; /* Roxo */
+}
+
+/* Estilo do Ícone (SVG) */
+.card-icon {
+    margin-right: 10px;
+    /* O SVG vai herdar esta cor */
+    color: #00b0ff; /* AZUL CLARO */
+    width: 24px;
+    height: 24px;
+}
+
+/* ESTILO ORIGINAL: Título (agora azul) */
+.card-title h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #00b0ff; /* AZUL CLARO */
+    font-weight: 500;
 }
 
 /* ESTILO ORIGINAL: Valor grande e branco */
 .card-header-main p {
-    font-size: 2.5rem; /* Fonte grande */
+    font-size: 2.5rem; 
     font-weight: 300;
     margin: 0;
     color: #ffffff;
@@ -91,7 +107,8 @@ header h1 {
     font-size: 1.5rem;
     color: #888;
     transition: transform 0.3s ease;
-    margin-left: 10px; /* Espaçamento para a seta */
+    margin-left: 10px; 
+    padding-top: 20px; /* Alinha a seta com o meio do card */
 }
 
 /* Conteúdo escondido */
