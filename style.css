@@ -77,20 +77,19 @@ header h1 {
     margin-bottom: 10px;
 }
 
-/* Estilo do Ícone (SVG) */
+/* Estilo do Ícone (SVG) - A COR AZUL/CIANO */
 .card-icon {
     margin-right: 10px;
-    /* O SVG vai herdar esta cor */
-    color: #00b0ff; /* AZUL CLARO */
+    color: #03dac6; /* AZUL/CIANO DO DESIGN ORIGINAL */
     width: 24px;
     height: 24px;
 }
 
-/* ESTILO ORIGINAL: Título (agora azul) */
+/* ESTILO ORIGINAL: Título (agora BRANCO) */
 .card-title h2 {
     margin: 0;
     font-size: 1.25rem;
-    color: #00b0ff; /* AZUL CLARO */
+    color: #ffffff; /* BRANCO */
     font-weight: 500;
 }
 
