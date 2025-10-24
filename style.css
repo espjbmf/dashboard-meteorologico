@@ -32,29 +32,38 @@ header h1 { margin: 0; color: var(--primary-color); font-weight: 300; font-size:
 /* --- NOVOS ESTILOS PARA OS CARDS EXPANSÍVEIS --- */
 
 .card {
+    /* Posição relativa para que o ícone "grip" possa ser posicionado absolutamente */
+    position: relative;
     /* Ajusta o padding e remove o justify-content para a expansão funcionar */
     padding: 20px;
-    justify-content: flex-start; 
+    justify-content: flex-start;
 }
 
-/* O cabeçalho clicável (contém ícone, título, valor e seta) */
+/* O cabeçalho clicável (contém ícone, título, valor) */
 .card-header {
+    /* O cabeçalho agora é o próprio card */
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
+    width: 100%;
     cursor: pointer;
     user-select: none;
-    width: 100%; 
-    /* Embrulha os elementos visuais originais */
-    flex-wrap: wrap; 
 }
 
-/* A seta que indica a expansão */
-.card-arrow {
-    font-size: 1.5rem;
+/* O ícone de "grip" (três linhas) */
+.card-grip-icon {
+    position: absolute;
+    bottom: 10px; /* Posição no canto inferior */
+    right: 15px;  /* Posição no canto direito */
+    width: 20px;
+    height: 20px;
     color: var(--secondary-color);
-    transition: transform 0.3s ease;
-    margin-left: 10px;
+    opacity: 0.5; /* Deixa bem sutil */
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.card:hover .card-grip-icon {
+    opacity: 1; /* Fica mais visível com o mouse em cima */
 }
 
 /* Conteúdo escondido */
@@ -63,8 +72,6 @@ header h1 { margin: 0; color: var(--primary-color); font-weight: 300; font-size:
     overflow: hidden;
     transition: max-height 0.4s ease-out;
     width: 100%;
-    
-    /* Estilo dos dados secundários */
     font-size: 1rem;
     color: var(--secondary-color);
     line-height: 1.6;
@@ -72,7 +79,7 @@ header h1 { margin: 0; color: var(--primary-color); font-weight: 300; font-size:
 
 /* ESTILO NOVO: Fonte pequena para os detalhes no conteúdo */
 .card-content p {
-    font-size: 0.95rem; 
+    font-size: 0.9rem; 
     color: var(--secondary-color);
     margin: 8px 0 0 0;
     font-weight: 300;
@@ -93,25 +100,36 @@ header h1 { margin: 0; color: var(--primary-color); font-weight: 300; font-size:
     transition: max-height 0.4s ease-in, margin-top 0.4s ease-in;
 }
 
-/* Gira a seta quando expandido */
-.card.expanded .card-arrow {
-    transform: rotate(180deg);
+/* Gira o ícone "grip" quando expandido (efeito sutil) */
+.card.expanded .card-grip-icon {
+    transform: rotate(90deg);
+    opacity: 1;
 }
 
 /* Ajustes no Card de Sumário (para o clique) */
+.summary-card {
+    /* O card de sumário é especial, não é flex-column */
+    flex-direction: column;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+}
 .summary-card .card-header {
     flex-direction: row;
     align-items: center;
     justify-content: center;
     gap: 20px;
-    width: 100%;
 }
 .summary-card .summary-text {
     margin-top: 0;
 }
-.summary-card .card-arrow {
-    padding-top: 0;
-    font-size: 2rem;
+.summary-card .card-grip-icon {
+    /* Posição diferente para o card de sumário */
+    position: absolute;
+    bottom: 10px;
+    right: 15px;
+    width: 24px;
+    height: 24px;
 }
 @media (max-width: 600px) {
     .summary-card .card-header {
