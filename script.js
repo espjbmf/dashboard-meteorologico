@@ -9,12 +9,11 @@ const firebaseConfig = {
   appId: "1:573048677136:web:86cae166c47daf024ebb95",
   measurementId: "G-SQXD1CTLX6"
 };
-// --- CONFIGURAÇÃO DO FIREBASE ---
 // Inicializa o Firebase
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// --- ELEMENTOS DO HTML ---
+// --- ELEMENTOS DO HTML (VALORES PRINCIPAIS) ---
 const statusText = document.getElementById('status-text');
 const statusIcon = document.getElementById('status-icon');
 
@@ -23,7 +22,7 @@ const umidadeValor = document.getElementById('umidade-valor');
 const ventoValor = document.getElementById('vento-valor');
 const pressaoValor = document.getElementById('pressao-valor');
 
-// Placeholders para os dados expandidos (ainda não estão a ser preenchidos)
+// --- ELEMENTOS DO HTML (VALORES EXPANDIDOS) ---
 const tempSensacao = document.getElementById('temp-sensacao');
 const tempMax = document.getElementById('temp-max');
 const tempMin = document.getElementById('temp-min');
@@ -33,33 +32,28 @@ const ventoMax = document.getElementById('vento-max');
 const pressaoTendencia = document.getElementById('pressao-tendencia');
 
 // --- CONEXÃO COM O FIREBASE (TEMPO REAL) ---
-
-// 1. Referência para o último dado em "dados"
 const ultimoDadoRef = database.ref('dados').orderByKey().limitToLast(1);
 
-// 2. Ouvinte de "valor"
 ultimoDadoRef.on('value', (snapshot) => {
     if (snapshot.exists()) {
         statusText.textContent = "Online";
         statusIcon.className = 'online';
 
-        // O Firebase retorna um objeto com o último ID, então precisamos "entrar" nele
         const ultimoDado = snapshot.val();
         const chaveUnica = Object.keys(ultimoDado)[0];
         const dados = ultimoDado[chaveUnica];
 
-        // 3. Atualiza os valores principais nos cards
+        // 1. Atualiza os valores principais (os que estão sempre visíveis)
         tempValor.textContent = `${parseFloat(dados.temperatura).toFixed(1)} °C`;
         umidadeValor.textContent = `${parseFloat(dados.umidade).toFixed(0)} %`;
         ventoValor.textContent = `${parseFloat(dados.velocidade_vento).toFixed(1)} km/h`;
         pressaoValor.textContent = `${parseFloat(dados.pressao).toFixed(1)} hPa`;
         
-        // --- PREENCHIMENTO DOS DADOS EXPANDIDOS ---
-        // (Por agora, vamos preencher os que já temos. Máx/Mín virão do ESP32 depois)
-        
+        // 2. Atualiza os valores expandidos
+        // (Por agora, só preenchemos os que o ESP32 já envia)
         ventoDirecao.textContent = dados.direcao_vento;
         
-        // (Deixamos os outros com "--" até o ESP32 enviar os dados)
+        // (Os dados de 'sensacao', 'max', 'min' virão do ESP32 no futuro)
         // tempSensacao.textContent = `${parseFloat(dados.sensacao_termica).toFixed(1)} °C`;
         // umidadeOrvalho.textContent = `${parseFloat(dados.ponto_orvalho).toFixed(1)} °C`;
 
@@ -73,23 +67,26 @@ ultimoDadoRef.on('value', (snapshot) => {
     statusIcon.className = 'offline';
 });
 
-// --- LÓGICA PARA TORNAR OS CARDS EXPANSÍVEIS ---
-// Adiciona o "ouvinte de clique" a cada card
 
-// Espera o HTML carregar completamente antes de adicionar os ouvintes
+// --- LÓGICA PARA TORNAR OS CARDS EXPANSÍVEIS ---
+// Esta função é executada assim que o HTML é carregado
 document.addEventListener('DOMContentLoaded', () => {
 
-    const cards = document.querySelectorAll('.card');
+    // Seleciona TODOS os elementos que têm a classe ".card-header"
+    const headers = document.querySelectorAll('.card-header');
 
-    cards.forEach(card => {
-        // Adiciona o ouvinte ao cabeçalho do card
-        const header = card.querySelector('.card-header');
-        if (header) {
-            header.addEventListener('click', () => {
-                // Adiciona ou remove a classe "expanded" do card pai
-                card.classList.toggle('expanded');
-            });
-        }
+    // Faz um loop por cada cabeçalho encontrado
+    headers.forEach(header => {
+        
+        // Adiciona um "ouvinte de clique" a este cabeçalho específico
+        header.addEventListener('click', () => {
+            // Encontra o elemento ".card" pai mais próximo
+            const cardPai = header.closest('.card');
+            
+            // Adiciona ou remove a classe "expanded" do card pai
+            if (cardPai) {
+                cardPai.classList.toggle('expanded');
+            }
+        });
     });
-
 });
