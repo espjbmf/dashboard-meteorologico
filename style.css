@@ -1,113 +1,59 @@
-/* Estilos Globais */
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #121212;
-    color: #e0e0e0;
-    margin: 0;
-    padding: 20px;
+:root {
+    --bg-color: #1a1c20; --card-color: #25282e; --text-color: #e1e1e1;
+    --primary-color: #00bcd4; --secondary-color: #8a8d93; --shadow-color: rgba(0, 0, 0, 0.4);
+    --success-color: #28a745; --warning-color: #f0ad4e; --error-color: #dc3545;
+}
+body { 
+    font-family: 'Roboto', sans-serif; background-color: var(--bg-color); color: var(--text-color); 
+    margin: 0; padding: 15px; display: flex; justify-content: center; align-items: flex-start; 
+    min-height: 100vh; box-sizing: border-box; 
+}
+.container { width: 100%; max-width: 850px; }
+header { text-align: center; margin-bottom: 25px; border-bottom: 1px solid var(--primary-color); padding-bottom: 15px; }
+header h1 { margin: 0; color: var(--primary-color); font-weight: 300; font-size: 24px; letter-spacing: 1px; text-transform: uppercase; }
+.summary-card { background-color: var(--card-color); border-radius: 10px; padding: 20px; text-align: center; margin-bottom: 25px; display: flex; align-items: center; justify-content: center; gap: 20px; }
+.summary-icon { width: 60px; height: 60px; fill: var(--primary-color); }
+.summary-text { font-size: 24px; font-weight: 300; margin: 0; color: var(--text-color); }
+.grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
+.card { background-color: var(--card-color); border-radius: 10px; padding: 20px 15px; text-align: center; transition: transform 0.3s ease; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
+/* Removido o :hover para que o clique seja mais previsível */
+/* .card:hover { transform: translateY(-3px); } */
+.card .card-icon { width: 35px; height: 35px; fill: var(--primary-color); margin-bottom: 10px; }
+.card h3 { margin: 0 0 8px 0; color: var(--secondary-color); font-weight: 400; font-size: 14px; text-transform: uppercase; }
+.card .value { font-size: 28px; font-weight: 700; color: var(--text-color); }
+.card .value span { font-size: 16px; font-weight: 300; color: var(--secondary-color); }
+.footer { text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--card-color); color: var(--secondary-color); font-size: 12px; }
+
+@media (max-width: 600px) {
+    .summary-card { flex-direction: column; gap: 10px; } .summary-text { font-size: 20px; }
+    .grid-container { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .card .value { font-size: 22px; } .card .value span { font-size: 12px; } .card h3 { font-size: 12px; }
 }
 
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-header h1 {
-    color: #ffffff;
-    margin: 0;
-}
-
-/* Indicador de Status */
-.status {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-#status-icon {
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    background-color: #ffc107; /* Amarelo (Conectando) */
-    transition: background-color 0.3s ease;
-}
-#status-icon.online {
-    background-color: #28a745; /* Verde (Online) */
-}
-#status-icon.offline {
-    background-color: #dc3545; /* Vermelho (Offline) */
-}
-
-/* Grid de Cards */
-.grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-}
+/* --- NOVOS ESTILOS PARA OS CARDS EXPANSÍVEIS --- */
 
 .card {
-    background-color: #1e1e1e;
-    border: 1px solid #333;
-    border-radius: 12px;
+    /* Ajusta o padding e remove o justify-content para a expansão funcionar */
     padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.3s ease;
+    justify-content: flex-start; 
 }
-
-/* --- ESTILOS DOS CARDS EXPANSÍVEIS (DESIGN CORRETO) --- */
 
 /* O cabeçalho clicável */
 .card-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start; /* Alinha no topo */
+    align-items: center; /* Alinha o ícone/título/valor com a seta */
     cursor: pointer;
-    user-select: none; 
-}
-
-.card-header-main { 
-    flex-grow: 1; 
-}
-
-/* Título (Ícone + Texto) */
-.card-title {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-/* Estilo do Ícone (SVG) - A COR AZUL/CIANO */
-.card-icon {
-    margin-right: 10px;
-    color: #03dac6; /* AZUL/CIANO DO DESIGN ORIGINAL */
-    width: 24px;
-    height: 24px;
-}
-
-/* ESTILO ORIGINAL: Título (agora BRANCO) */
-.card-title h2 {
-    margin: 0;
-    font-size: 1.25rem;
-    color: #ffffff; /* BRANCO */
-    font-weight: 500;
-}
-
-/* ESTILO ORIGINAL: Valor grande e branco */
-.card-header-main p {
-    font-size: 2.5rem; 
-    font-weight: 300;
-    margin: 0;
-    color: #ffffff;
+    user-select: none;
+    width: 100%; /* Faz o cabeçalho ocupar todo o card */
 }
 
 /* A seta que indica a expansão */
 .card-arrow {
     font-size: 1.5rem;
-    color: #888;
+    color: var(--secondary-color);
     transition: transform 0.3s ease;
-    margin-left: 10px; 
-    padding-top: 20px; /* Alinha a seta com o meio do card */
+    margin-left: 10px;
 }
 
 /* Conteúdo escondido */
@@ -115,32 +61,34 @@ header h1 {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.4s ease-out;
+    width: 100%;
     
     /* Estilo dos dados secundários */
     font-size: 1rem;
-    color: #b0b0b0;
+    color: var(--secondary-color);
     line-height: 1.6;
 }
 
 /* ESTILO NOVO: Fonte pequena para os detalhes no conteúdo */
 .card-content p {
     font-size: 0.95rem; 
-    color: #b0b0b0;
+    color: var(--secondary-color);
     margin: 8px 0 0 0;
     font-weight: 300;
+    text-align: left; /* Alinha os detalhes à esquerda */
 }
 
 .card-content span {
-    color: #ffffff; 
+    color: var(--text-color); /* Fonte branca para o valor */
     font-weight: 500;
 }
 
 /* Estado "Expandido" */
 .card.expanded .card-content {
     max-height: 200px; /* Altura suficiente para o conteúdo aparecer */
-    margin-top: 20px;
+    margin-top: 15px;
     padding-top: 15px;
-    border-top: 1px solid #333;
+    border-top: 1px solid #333; /* Linha divisória */
     transition: max-height 0.4s ease-in, margin-top 0.4s ease-in;
 }
 
