@@ -169,7 +169,7 @@ function analisarCondicoes(temperatura, umidade, vento, pontoOrvalho) {
         return { texto: "Erro nos Sensores", icone: ICONE_NEBLINA };
     }
     if (umidade > 95 && (temperatura - parseFloat(pontoOrvalho) < 2.5)) {
-        return { texto: "Neblina / Serração", icone: ICONE_NEBLINA };
+        return { texto: "Neblina / Cerração", icone: ICONE_NEBLINA };
     } else if (vento > 35) {
         return { texto: "Ventania", icone: ICONE_VENTO };
     } else if (temperatura > 32) {
@@ -303,3 +303,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
