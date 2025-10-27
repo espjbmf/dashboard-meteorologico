@@ -256,7 +256,7 @@ function preencherDescricoes(sumarioTexto, potencialTexto, uvTexto) {
 
     // Descrições dinâmicas
     const descSumario = {
-        "Neblina / Serração": "Visibilidade reduzida. O ar está saturado de umidade e a temperatura é igual ao ponto de orvalho.",
+        "Neblina / Cerração": "Visibilidade reduzida. O ar está saturado de umidade e a temperatura é igual ao ponto de orvalho.",
         "Ventania": "Ventos fortes. Risco de queda de objetos e poeira.",
         "Tórrido e Abafado": "Calor extremo e muito úmido. Risco elevado de exaustão pelo calor.",
         "Tórrido e Seco": "Calor extremo e ar muito seco. Risco de desidratação e problemas respiratórios.",
@@ -303,4 +303,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
 
