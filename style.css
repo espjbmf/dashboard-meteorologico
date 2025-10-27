@@ -1,9 +1,9 @@
 :root {
-    --bg-color: #1a1c20;
-    --card-color: #25282e;
-    --text-color: #e1e1e1;
-    --primary-color: #00bcd4;
-    --secondary-color: #8a8d93;
+    --bg-color: #1a1c20; /* Fundo escuro principal */
+    --card-color: #25282e; /* Cor escura dos cards */
+    --text-color: #e1e1e1; /* Cor do valor principal (branco/claro) */
+    --primary-color: #00bcd4; /* Ciano/Azul (para ícones e destaque) */
+    --secondary-color: #8a8d93; /* Cinza (para títulos e detalhes) */
     --shadow-color: rgba(0, 0, 0, 0.4);
     --success-color: #28a745;
     --warning-color: #f0ad4e;
@@ -24,53 +24,26 @@ body {
     box-sizing: border-box;
 }
 
-.container {
-    width: 100%;
-    max-width: 850px;
-}
+.container { width: 100%; max-width: 850px; }
+header { text-align: center; margin-bottom: 25px; border-bottom: 1px solid var(--primary-color); padding-bottom: 15px; }
+header h1 { margin: 0; color: var(--primary-color); font-weight: 300; font-size: 24px; letter-spacing: 1px; text-transform: uppercase; }
 
-header {
-    text-align: center;
-    margin-bottom: 25px;
-    border-bottom: 1px solid var(--primary-color);
-    padding-bottom: 15px;
-}
+/* Layout original do Sumário */
+.summary-card { background-color: var(--card-color); border-radius: 10px; padding: 20px; text-align: center; margin-bottom: 25px; position: relative; cursor: pointer; user-select: none; display: flex; flex-direction: column; align-items: center; }
+.summary-card .card-header { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 20px; width: 100%; }
+.summary-icon { width: 60px; height: 60px; fill: var(--primary-color); }
+.summary-text { font-size: 24px; font-weight: 300; margin: 0; color: var(--text-color); margin-top: 10px; }
 
-header h1 {
-    margin: 0;
-    color: var(--primary-color);
-    font-weight: 300;
-    font-size: 24px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
+.grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
 
-/* Grid de Cards */
-.grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 15px;
-    margin-bottom: 20px;
-}
+/* ESTILOS DOS CARDS INDIVIDUAIS */
+.card { background-color: var(--card-color); border-radius: 10px; padding: 20px 15px; text-align: center; transition: transform 0.3s ease; position: relative; cursor: pointer; user-select: none; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
+.card .card-icon { width: 35px; height: 35px; fill: var(--primary-color); margin-bottom: 10px; }
+.card h3 { margin: 0 0 8px 0; color: var(--secondary-color); font-weight: 400; font-size: 14px; text-transform: uppercase; }
+.card .value { font-size: 28px; font-weight: 700; color: var(--text-color); }
+.card .value span { font-size: 16px; font-weight: 300; color: var(--secondary-color); }
 
-/* -------------------------------------- */
-/* --- ESTILO DOS CARDS E EXPANSÃO --- */
-/* -------------------------------------- */
-
-.card {
-    background-color: var(--card-color);
-    border-radius: 10px;
-    padding: 20px;
-    text-align: center;
-    transition: transform 0.3s ease;
-    position: relative; /* Para o ícone de grip */
-    cursor: pointer;
-    user-select: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start; /* Alinha o conteúdo ao topo */
-}
+/* --- NOVOS ESTILOS PARA EXPANSÃO --- */
 
 .card .card-header {
     display: flex;
@@ -79,21 +52,15 @@ header h1 {
     width: 100%;
 }
 
-/* ESTILOS ORIGINAIS DE CARD */
-.card .card-icon { width: 35px; height: 35px; fill: var(--primary-color); margin-bottom: 10px; }
-.card h3 { margin: 0 0 8px 0; color: var(--secondary-color); font-weight: 400; font-size: 14px; text-transform: uppercase; }
-.card .value { font-size: 28px; font-weight: 700; color: var(--text-color); }
-.card .value span { font-size: 16px; font-weight: 300; color: var(--secondary-color); }
-
 /* O ícone de "grip" (três linhas inclinadas) */
 .card-grip-icon {
     position: absolute;
-    bottom: 8px; /* Posição no canto inferior */
-    right: 12px;  /* Posição no canto direito */
+    bottom: 8px; 
+    right: 12px;
     width: 18px;
     height: 18px;
     color: var(--secondary-color);
-    opacity: 0.3; /* Sutil */
+    opacity: 0.3; /* Sutil por padrão */
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
@@ -113,7 +80,6 @@ header h1 {
     padding-top: 0;
 }
 
-/* Estilo para os detalhes no conteúdo */
 .card-content p {
     font-size: 0.95rem; 
     color: var(--secondary-color);
@@ -122,7 +88,7 @@ header h1 {
 }
 .card-content span { color: var(--text-color); font-weight: 500; }
 
-/* Linha divisória e transição para o estado expandido */
+/* Estado "Expandido" */
 .card.expanded .card-content {
     max-height: 200px;
     margin-top: 15px;
@@ -131,96 +97,46 @@ header h1 {
     transition: max-height 0.4s ease-in, margin-top 0.4s ease-in;
 }
 
-/* Rotação do ícone de grip */
+/* Rotação do ícone de grip (Fica como um "X" quando expande) */
 .card.expanded .card-grip-icon {
     transform: rotate(135deg);
     opacity: 0.8;
 }
 
-/* -------------------------------------- */
-/* --- ESTILO CARD DE SUMÁRIO (MAIN) --- */
-/* -------------------------------------- */
-
-.summary-card .card-header {
-    flex-direction: row; /* Volta para linha no header do sumário */
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    width: 100%;
-}
-
-.summary-card .summary-text {
-    margin-top: 0;
-}
-
-.summary-card .card-grip-icon {
-    /* Posição para o card de sumário */
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    width: 24px;
-    height: 24px;
-}
-
-/* -------------------------------------- */
-/* --- STATUS DO SISTEMA E BOTOES (Sem alteração) --- */
-/* -------------------------------------- */
-
+/* Estilos de Status do Sistema (Não alterados) */
 .system-status-card { grid-column: 1 / -1; padding: 10px 15px; margin-top: 10px; background-color: var(--card-color); border-radius: 10px; }
-.system-status-card h2 { text-align: center; color: var(--primary-color); font-weight: 300; font-size: 18px; margin-top: 5px; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px; }
+.system-status-card h2 { text-align: center; color: var(--primary-color); font-weight: 300; font-size: 18px; margin: 0 0 15px 0; border-bottom: 1px solid #444; padding-bottom: 10px; }
 .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; text-align: center; }
-.status-item h3 { font-size: 13px; margin: 0 0 2px 0;}
-.status-item .value { font-size: 16px; font-weight: bold; }
-.value.ok { color: var(--success-color); } .value.attention { color: var(--warning-color); } .value.error { color: var(--error-color); }
+.status-item h3 { font-size: 13px; margin: 0 0 2px 0; color: var(--secondary-color); }
+.status-item .value { font-size: 18px; font-weight: 700; color: var(--text-color); }
+.status-item .value span { font-size: 12px; color: var(--secondary-color); }
+.status-item .value.ok { color: var(--success-color); } .value.attention { color: var(--attention-color); } .value.error { color: var(--error-color); }
+
 .botoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 25px; }
-.botao { background-color: var(--primary-color); border: none; color: var(--bg-color); padding: 12px 20px; text-decoration: none; font-size: 14px; cursor: pointer; border-radius: 5px; transition: background-color 0.3s ease; font-weight: bold; flex-grow: 1; flex-basis: 150px; text-align: center; max-width: 250px; }
-.botao-vermelho { background-color: var(--error-color); color: var(--text-color); } .botao-amarelo { background-color: var(--warning-color); color: var(--bg-color); }
-.error-log-container { background-color: #000; border-radius: 10px; padding: 20px; margin-top: 20px; font-family: monospace; white-space: pre; overflow-x: auto; max-height: 300px; border: 1px solid var(--secondary-color); font-size: 12px;}
-.error-log-container h2 { font-family: 'Roboto', sans-serif; }
+.botao { text-decoration: none; padding: 12px 20px; border-radius: 5px; font-weight: 500; font-size: 14px; color: var(--text-color); background-color: var(--primary-color); border: none; cursor: pointer; transition: background-color 0.2s ease; }
+.botao:hover { background-color: #008c9e; }
+.botao-amarelo { background-color: var(--attention-color); }
+.botao-amarelo:hover { background-color: #c7913a; }
+.botao-vermelho { background-color: var(--error-color); }
+.botao-vermelho:hover { background-color: #b22d3d; }
+
+.error-log-container { background-color: #111; padding: 15px; border-radius: 8px; margin-top: 15px; }
+.error-log-container h2 { color: var(--warning-color); font-size: 16px; margin-top: 0; }
+.error-log-container code { white-space: pre-wrap; display: block; font-family: monospace; color: #ccc; font-size: 12px; }
+
 .footer { text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--card-color); color: var(--secondary-color); font-size: 12px; }
 
 @media (max-width: 600px) {
-    .summary-card .card-header {
-        flex-direction: column;
-        gap: 10px;
-    }
-    .summary-text {
-        font-size: 20px;
-    }
-    .summary-icon {
-        width: 50px;
-        height: 50px;
-    }
-    .summary-card .card-grip-icon {
-        top: 8px;
-        right: 8px;
-        width: 18px;
-        height: 18px;
-    }
-    .grid-container {
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-    }
-    .card {
-        padding: 15px 10px;
-    }
-    .card .value {
-        font-size: 22px;
-    }
-    .card .value span {
-        font-size: 12px;
-    }
-    .card h3 {
-        font-size: 12px;
-    }
-    .status-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-    .botoes {
-        justify-content: space-around;
-    }
-    .botao {
-        width: 45%;
-        text-align: center;
-    }
+    .summary-card .card-header { flex-direction: column; gap: 10px; }
+    .summary-text { font-size: 20px; }
+    .summary-icon { width: 50px; height: 50px; }
+    .summary-card .card-grip-icon { top: 8px; right: 8px; width: 18px; height: 18px; }
+    .grid-container { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .card { padding: 15px 10px; }
+    .card .value { font-size: 22px; }
+    .card .value span { font-size: 12px; }
+    .card h3 { font-size: 12px; }
+    .status-grid { grid-template-columns: 1fr 1fr; }
+    .botoes { justify-content: space-around; }
+    .botao { width: 45%; text-align: center; }
 }
