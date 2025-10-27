@@ -1,49 +1,75 @@
 :root {
-    --bg-color: #1a1c20; --card-color: #25282e; --text-color: #e1e1e1;
-    --primary-color: #00bcd4; --secondary-color: #8a8d93; --shadow-color: rgba(0, 0, 0, 0.4);
-    --success-color: #28a745; --warning-color: #f0ad4e; --error-color: #dc3545;
-}
-body { 
-    font-family: 'Roboto', sans-serif; background-color: var(--bg-color); color: var(--text-color); 
-    margin: 0; padding: 15px; display: flex; justify-content: center; align-items: flex-start; 
-    min-height: 100vh; box-sizing: border-box; 
-}
-.container { width: 100%; max-width: 850px; }
-header { text-align: center; margin-bottom: 25px; border-bottom: 1px solid var(--primary-color); padding-bottom: 15px; }
-header h1 { margin: 0; color: var(--primary-color); font-weight: 300; font-size: 24px; letter-spacing: 1px; text-transform: uppercase; }
-.summary-card { background-color: var(--card-color); border-radius: 10px; padding: 20px; text-align: center; margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; }
-.summary-icon { width: 60px; height: 60px; fill: var(--primary-color); }
-.summary-text { font-size: 24px; font-weight: 300; margin: 0; color: var(--text-color); margin-top: 10px; }
-.grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
-.card { background-color: var(--card-color); border-radius: 10px; padding: 20px 15px; text-align: center; transition: transform 0.3s ease; display: flex; flex-direction: column; align-items: center; }
-/* .card:hover { transform: translateY(-3px); } */ /* Removido para o clique ser o foco */
-.card .card-icon { width: 35px; height: 35px; fill: var(--primary-color); margin-bottom: 10px; }
-.card h3 { margin: 0 0 8px 0; color: var(--secondary-color); font-weight: 400; font-size: 14px; text-transform: uppercase; }
-.card .value { font-size: 28px; font-weight: 700; color: var(--text-color); }
-.card .value span { font-size: 16px; font-weight: 300; color: var(--secondary-color); }
-.footer { text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--card-color); color: var(--secondary-color); font-size: 12px; }
-
-@media (max-width: 600px) {
-    .summary-card { flex-direction: column; gap: 10px; } .summary-text { font-size: 20px; }
-    .grid-container { grid-template-columns: 1fr 1fr; gap: 10px; }
-    .card .value { font-size: 22px; } .card .value span { font-size: 12px; } .card h3 { font-size: 12px; }
+    --bg-color: #1a1c20;
+    --card-color: #25282e;
+    --text-color: #e1e1e1;
+    --primary-color: #00bcd4;
+    --secondary-color: #8a8d93;
+    --shadow-color: rgba(0, 0, 0, 0.4);
+    --success-color: #28a745;
+    --warning-color: #f0ad4e;
+    --error-color: #dc3545;
+    --attention-color: #f0ad4e;
 }
 
-/* --- NOVOS ESTILOS PARA OS CARDS EXPANSÍVEIS --- */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.container {
+    width: 100%;
+    max-width: 850px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 25px;
+    border-bottom: 1px solid var(--primary-color);
+    padding-bottom: 15px;
+}
+
+header h1 {
+    margin: 0;
+    color: var(--primary-color);
+    font-weight: 300;
+    font-size: 24px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+/* -------------------------------------- */
+/* --- ESTILO DOS CARDS E EXPANSÃO --- */
+/* -------------------------------------- */
 
 .card {
-    /* Posição relativa para que o ícone "grip" possa ser posicionado */
-    position: relative;
-    /* Ajusta o padding e remove o justify-content para a expansão funcionar */
+    background-color: var(--card-color);
+    border-radius: 10px;
     padding: 20px;
-    justify-content: flex-start;
-    /* Adiciona uma transição suave de cor ao clicar */
+    text-align: center;
     transition: background-color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative; /* Para o ícone de grip */
 }
 
-/* O cabeçalho clicável (contém ícone, título, valor) */
-.card-header {
-    /* O cabeçalho agora é o próprio card */
+/* Estilo do cabeçalho que é clicável */
+.card .card-header {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -52,19 +78,45 @@ header h1 { margin: 0; color: var(--primary-color); font-weight: 300; font-size:
     user-select: none;
 }
 
+.card .card-icon {
+    width: 35px;
+    height: 35px;
+    fill: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.card h3 {
+    margin: 0 0 8px 0;
+    color: var(--secondary-color);
+    font-weight: 400;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.card .value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.card .value span {
+    font-size: 16px;
+    font-weight: 300;
+    color: var(--secondary-color);
+}
+
 /* O ícone de "grip" (três linhas inclinadas) */
 .card-grip-icon {
     position: absolute;
-    bottom: 8px; /* Posição no canto inferior */
-    right: 12px;  /* Posição no canto direito */
-    width: 18px;  /* Tamanho sutil */
+    bottom: 8px; 
+    right: 12px;
+    width: 18px;
     height: 18px;
     color: var(--secondary-color);
-    opacity: 0.3; /* BEM SUTIL (mais opaco) */
+    opacity: 0.3;
     transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-/* Mostra um pouco mais o ícone quando o mouse passa sobre o card */
 .card:hover .card-grip-icon {
     opacity: 0.7;
 }
@@ -78,69 +130,255 @@ header h1 { margin: 0; color: var(--primary-color); font-weight: 300; font-size:
     font-size: 1rem;
     color: var(--secondary-color);
     line-height: 1.6;
+    text-align: left; /* Alinha o conteúdo à esquerda */
 }
 
-/* Estilo para os detalhes no conteúdo */
-.card-content p {
-    font-size: 0.9rem; 
-    color: var(--secondary-color);
-    margin: 8px 0 0 0;
-    font-weight: 300;
-    text-align: left; /* Alinha os detalhes à esquerda */
-}
-.card-content p strong {
-    color: var(--text-color);
-    font-weight: 500;
-}
-.card-content span {
-    color: var(--text-color); /* Fonte branca para o valor */
-    font-weight: 500;
-}
-
-/* Estado "Expandido" */
+/* Linha divisória e transição para o estado expandido */
 .card.expanded .card-content {
-    max-height: 200px; /* Altura suficiente para o conteúdo aparecer */
+    max-height: 200px;
     margin-top: 15px;
     padding-top: 15px;
-    border-top: 1px solid #333; /* Linha divisória */
+    border-top: 1px solid #333;
     transition: max-height 0.4s ease-in, margin-top 0.4s ease-in;
 }
 
-/* Roda as linhas inclinadas para formar um "X" sutil */
+/* Rotação do ícone de grip */
 .card.expanded .card-grip-icon {
     transform: rotate(135deg);
     opacity: 0.8;
 }
 
-/* Ajustes no Card de Sumário (para o clique) */
-.summary-card {
-    /* O card de sumário é especial, não é flex-column */
-    flex-direction: column;
-    position: relative;
-    cursor: pointer;
-    user-select: none;
+/* Estilo para os detalhes (Min/Max/Descrição) no conteúdo */
+.card-content p {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    margin: 8px 0 0 0;
+    font-weight: 300;
 }
+.card-content span {
+    color: var(--text-color); 
+    font-weight: 500;
+}
+
+/* -------------------------------------- */
+/* --- ESTILO CARD DE SUMÁRIO (MAIN) --- */
+/* -------------------------------------- */
+
+.summary-card {
+    background-color: var(--card-color);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+}
+
 .summary-card .card-header {
-    flex-direction: row;
+    flex-direction: row; /* Volta para linha no header do sumário */
     align-items: center;
     justify-content: center;
     gap: 20px;
     width: 100%;
 }
-.summary-card .summary-text {
-    margin-top: 0;
+
+.summary-icon {
+    width: 60px;
+    height: 60px;
+    fill: var(--primary-color);
 }
+
+.summary-text {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-color);
+}
+
 .summary-card .card-grip-icon {
-    /* Posição diferente para o card de sumário */
     position: absolute;
-    bottom: 10px;
+    top: 10px; /* Altera a posição para o card de sumário */
     right: 15px;
     width: 24px;
     height: 24px;
 }
+
+/* -------------------------------------- */
+/* --- STATUS DO SISTEMA E BOTOES --- */
+/* -------------------------------------- */
+
+.system-status-card {
+    background-color: var(--card-color);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: left;
+    position: relative;
+}
+
+/* Garante que o Card de Status não tenha o cursor de clique */
+.system-status-card .card-header {
+    cursor: default;
+}
+.system-status-card .card-grip-icon {
+    display: none; /* Esconde o ícone de grip neste card */
+}
+
+.system-status-card h2 {
+    color: var(--primary-color);
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0 0 15px 0;
+}
+
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 15px;
+}
+
+.status-item h3 {
+    margin: 0;
+    color: var(--secondary-color);
+    font-weight: 400;
+    font-size: 13px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.status-item .value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-color);
+}
+.status-item .value span {
+    font-size: 12px;
+}
+.status-item .value.ok { color: var(--success-color); }
+.status-item .value.error { color: var(--error-color); }
+.status-item .value.attention { color: var(--attention-color); }
+
+
+.botoes {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.botao {
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-color);
+    background-color: var(--primary-color);
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.botao:hover {
+    background-color: #008c9e;
+}
+
+.botao-amarelo {
+    background-color: var(--attention-color);
+}
+.botao-amarelo:hover {
+    background-color: #c7913a;
+}
+
+.botao-vermelho {
+    background-color: var(--error-color);
+}
+.botao-vermelho:hover {
+    background-color: #b22d3d;
+}
+
+/* LOG DE ERROS */
+.error-log-container {
+    background-color: #111;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+.error-log-container h2 {
+    color: var(--warning-color);
+    font-size: 16px;
+    margin-top: 0;
+}
+.error-log-container code {
+    white-space: pre-wrap;
+    display: block;
+    font-family: monospace;
+    color: #ccc;
+    font-size: 12px;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid var(--card-color);
+    color: var(--secondary-color);
+    font-size: 12px;
+}
+
+/* -------------------------------------- */
+/* --- MEDIA QUERIES (RESPONSIVIDADE) --- */
+/* -------------------------------------- */
+
 @media (max-width: 600px) {
     .summary-card .card-header {
         flex-direction: column;
         gap: 10px;
+    }
+    .summary-text {
+        font-size: 24px;
+    }
+    .summary-icon {
+        width: 50px;
+        height: 50px;
+    }
+    .summary-card .card-grip-icon {
+        top: 8px;
+        right: 8px;
+        width: 18px;
+        height: 18px;
+    }
+
+    .grid-container {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    
+    .card {
+        padding: 15px 10px;
+    }
+    .card .value {
+        font-size: 22px;
+    }
+    .card .value span {
+        font-size: 12px;
+    }
+    .card h3 {
+        font-size: 12px;
+    }
+    
+    .status-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .botoes {
+        justify-content: space-around;
+    }
+    .botao {
+        width: 45%; /* Ajusta os botões para duas colunas */
+        text-align: center;
     }
 }
