@@ -22,13 +22,14 @@ let isLeader = false;
 let leaderCheckTimeout;
 
 // ==========================================================
-// NOVO BLOCO: INICIALIZAÇÃO E SINCRONIZAÇÃO DE ALERTA FIREBASE
+// INICIALIZAÇÃO E SINCRONIZAÇÃO DE ALERTA FIREBASE (NOVO PONTO DE ENTRADA)
 // ==========================================================
 
 /** * [SOLUÇÃO MÓVEL] Verifica o estado de inatividade no Firebase antes de 
  * iniciar a liderança. Garante que o alerta aparece imediatamente no celular.
  */
 function verificarEstadoDoAlertaFirebase() {
+    // Inicializa o Firebase (isso só acontece uma vez)
     const app = firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
     // A função monitorarStatusDaEstacao da Cloud Function escreve neste caminho
@@ -39,7 +40,6 @@ function verificarEstadoDoAlertaFirebase() {
         
         if (isOffline === true) {
             console.warn("[SYNC] Cloud Function marcou: Estação OFFLINE. Mostrando aviso.");
-            // Mostra o aviso imediatamente na tela, antes da eleição de líder.
             showInactivityWarning(); 
         } else {
              console.log("[SYNC] Cloud Function marcou: Estação ONLINE.");
@@ -55,7 +55,7 @@ verificarEstadoDoAlertaFirebase();
 
 
 // ==========================================================
-// FUNÇÕES DE LIDERANÇA E CHECAGEM (MANTIDAS)
+// FUNÇÕES DE LIDERANÇA E CHECAGEM 
 // ==========================================================
 
 function elegerLider() {
@@ -63,7 +63,6 @@ function elegerLider() {
     channel.postMessage({ type: 'CLAIM_LEADERSHIP' });
     console.log("Esta aba está tentando se tornar a líder...");
     
-    // Força uma checagem de inatividade imediatamente!
     checkForInactivity(); 
     
     iniciarConexaoFirebase();
@@ -99,9 +98,6 @@ channel.onmessage = (event) => {
         }
     }
 };
-
-// A chamada ao setTimeout ANTERIORMENTE aqui FOI MOVIDA para o final de verificarEstadoDoAlertaFirebase().
-
 
 // --- LÓGICA DE CHECAGEM DE INATIVIDADE ---
 
@@ -157,16 +153,28 @@ function hideInactivityWarning() {
 }
 
 
-// --- LÓGICA DO FIREBASE ---
+// --- LÓGICA DO FIREBASE (CORRIGIDA) ---
 
 function iniciarConexaoFirebase() {
-    // A inicialização do Firebase já ocorre em verificarEstadoDoAlertaFirebase()
+    // [CORREÇÃO APLICADA] Reutiliza a instância do Firebase já inicializada.
     const app = firebase.apps[0]; 
-    const database = app.database();
+    
+    if (!app) {
+        console.error("Firebase App não encontrado! Falha na inicialização.");
+        // Se a inicialização falhou acima, tenta novamente (como último recurso)
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+    }
+    
+    const database = firebase.database();
     const latestDataRef = database.ref('dados').orderByKey().limitToLast(1);
 
     latestDataRef.on('value', (snapshot) => {
-        if (!snapshot.exists()) return;
+        if (!snapshot.exists()) {
+            console.warn("Nenhum dado encontrado no caminho '/dados'.");
+            return;
+        }
 
         const latestDataObj = snapshot.val();
         const pushId = Object.keys(latestDataObj)[0];
