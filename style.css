@@ -1,13 +1,13 @@
 :root {
-    --bg-color: #1a1c20; /* Fundo escuro principal (Original) */
-    --card-color: #25282e; /* Cor escura dos cards (Original) */
-    --text-color: #e1e1e1; /* Cor do valor principal (Original) */
-    --primary-color: #00bcd4; /* Ciano/Azul (Original) */
-    --secondary-color: #8a8d93; /* Cinza (Original) */
+    --bg-color: #1a1c20; /* Fundo escuro principal */
+    --card-color: #25282e; /* Cor escura dos cards */
+    --text-color: #e1e1e1; /* Cor do valor principal (branco/claro) */
+    --primary-color: #00bcd4; /* Ciano/Azul (para ícones e destaque) */
+    --secondary-color: #8a8d93; /* Cinza (para títulos e detalhes) */
     --shadow-color: rgba(0, 0, 0, 0.4);
     --success-color: #28a745;
     --warning-color: #f0ad4e;
-    --error-color: #dc3545; /* Vermelho forte */
+    --error-color: #dc3545;
     --attention-color: #f0ad4e;
 }
 
@@ -22,8 +22,6 @@ body {
     align-items: flex-start;
     min-height: 100vh;
     box-sizing: border-box;
-    /* Transição para suavizar a mudança de cor do body */
-    transition: background-color 0.5s ease;
 }
 
 .container { width: 100%; max-width: 850px; }
@@ -31,27 +29,21 @@ header { text-align: center; margin-bottom: 25px; border-bottom: 1px solid var(-
 header h1 { margin: 0; color: var(--primary-color); font-weight: 300; font-size: 24px; letter-spacing: 1px; text-transform: uppercase; }
 
 /* Layout original do Sumário */
-.summary-card { 
-    background-color: var(--card-color); border-radius: 10px; padding: 20px; text-align: center; margin-bottom: 25px; position: relative; cursor: pointer; user-select: none; display: flex; flex-direction: column; align-items: center; 
-    transition: background-color 0.5s ease, border-color 0.5s ease; /* Adiciona transição */
-}
+.summary-card { background-color: var(--card-color); border-radius: 10px; padding: 20px; text-align: center; margin-bottom: 25px; position: relative; cursor: pointer; user-select: none; display: flex; flex-direction: column; align-items: center; }
 .summary-card .card-header { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 20px; width: 100%; }
-.summary-icon { width: 60px; height: 60px; fill: var(--primary-color); transition: fill 0.5s ease; }
+.summary-icon { width: 60px; height: 60px; fill: var(--primary-color); }
 .summary-text { font-size: 24px; font-weight: 300; margin: 0; color: var(--text-color); margin-top: 10px; }
 
 .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
 
 /* ESTILOS DOS CARDS INDIVIDUAIS */
-.card { 
-    background-color: var(--card-color); border-radius: 10px; padding: 20px 15px; text-align: center; transition: transform 0.3s ease, background-color 0.5s ease; /* Adiciona transição */
-    position: relative; cursor: pointer; user-select: none; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; 
-}
-.card .card-icon { width: 35px; height: 35px; fill: var(--primary-color); margin-bottom: 10px; transition: fill 0.5s ease; }
-.card h3 { margin: 0 0 8px 0; color: var(--secondary-color); font-weight: 400; font-size: 14px; text-transform: uppercase; transition: color 0.5s ease; }
+.card { background-color: var(--card-color); border-radius: 10px; padding: 20px 15px; text-align: center; transition: transform 0.3s ease; position: relative; cursor: pointer; user-select: none; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
+.card .card-icon { width: 35px; height: 35px; fill: var(--primary-color); margin-bottom: 10px; }
+.card h3 { margin: 0 0 8px 0; color: var(--secondary-color); font-weight: 400; font-size: 14px; text-transform: uppercase; }
 .card .value { font-size: 28px; font-weight: 700; color: var(--text-color); }
-.card .value span { font-size: 16px; font-weight: 300; color: var(--secondary-color); transition: color 0.5s ease; }
+.card .value span { font-size: 16px; font-weight: 300; color: var(--secondary-color); }
 
-/* --- ESTILOS PARA EXPANSÃO (MANTIDOS) --- */
+/* --- ESTILOS PARA EXPANSÃO --- */
 
 .card .card-header {
     display: flex;
@@ -60,6 +52,7 @@ header h1 { margin: 0; color: var(--primary-color); font-weight: 300; font-size:
     width: 100%;
 }
 
+/* O ícone de "grip" (três linhas inclinadas) */
 .card-grip-icon {
     position: absolute;
     bottom: 8px; 
@@ -67,12 +60,13 @@ header h1 { margin: 0; color: var(--primary-color); font-weight: 300; font-size:
     width: 18px;
     height: 18px;
     color: var(--secondary-color);
-    opacity: 0.3; 
-    transition: opacity 0.3s ease, transform 0.3s ease, color 0.5s ease;
+    opacity: 0.3; /* Sutil por padrão */
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .card:hover .card-grip-icon { opacity: 0.7; }
 
+/* Conteúdo escondido */
 .card-content {
     max-height: 0;
     overflow: hidden;
@@ -81,7 +75,7 @@ header h1 { margin: 0; color: var(--primary-color); font-weight: 300; font-size:
     font-size: 0.9rem;
     color: var(--secondary-color);
     line-height: 1.6;
-    text-align: left; 
+    text-align: left; /* Alinha o conteúdo à esquerda */
     margin-top: 0;
     padding-top: 0;
 }
@@ -91,10 +85,10 @@ header h1 { margin: 0; color: var(--primary-color); font-weight: 300; font-size:
     color: var(--secondary-color);
     margin: 8px 0 0 0;
     font-weight: 300;
-    transition: color 0.5s ease;
 }
 .card-content span { color: var(--text-color); font-weight: 500; }
 
+/* Estado "Expandido" */
 .card.expanded .card-content {
     max-height: 200px;
     margin-top: 15px;
@@ -103,29 +97,73 @@ header h1 { margin: 0; color: var(--primary-color); font-weight: 300; font-size:
     transition: max-height 0.4s ease-in, margin-top 0.4s ease-in;
 }
 
+/* Rotação do ícone de grip (Fica como um "X" quando expande) */
 .card.expanded .card-grip-icon {
     transform: rotate(135deg);
     opacity: 0.8;
 }
 
-/* --- NOVO: ESTILO PARA O AVISO DE INATIVIDADE (TEMA VERMELHO) --- */
+/* Estilos de Status do Sistema (Não alterados) */
+.system-status-card { grid-column: 1 / -1; padding: 10px 15px; margin-top: 10px; background-color: var(--card-color); border-radius: 10px; }
+.system-status-card h2 { text-align: center; color: var(--primary-color); font-weight: 300; font-size: 18px; margin: 0 0 15px 0; border-bottom: 1px solid #444; padding-bottom: 10px; }
+.status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; text-align: center; }
+.status-item h3 { font-size: 13px; margin: 0 0 2px 0; color: var(--secondary-color); }
+.status-item .value { font-size: 18px; font-weight: 700; color: var(--text-color); }
+.status-item .value span { font-size: 12px; color: var(--secondary-color); }
+.status-item .value.ok { color: var(--success-color); } .value.attention { color: var(--attention-color); } .value.error { color: var(--error-color); }
 
-/* Quando o body tem a classe 'inactivity-warning-active', mudamos as variáveis globais */
-body.inactivity-warning-active {
-    /* Altera as cores para o tema de erro */
-    --bg-color: #2e1a1e; /* Fundo mais escuro/avermelhado */
-    --card-color: #3b2024; /* Cards em tom de vinho/vermelho escuro */
-    --primary-color: var(--error-color); /* Ícones e cabeçalhos principais ficam vermelhos */
-    --secondary-color: #f0a0a8; /* Cinza claro vira vermelho claro */
+.botoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 25px; }
+.botao { text-decoration: none; padding: 12px 20px; border-radius: 5px; font-weight: 500; font-size: 14px; color: var(--text-color); background-color: var(--primary-color); border: none; cursor: pointer; transition: background-color 0.2s ease; }
+.botao:hover { background-color: #008c9e; }
+.botao-amarelo { background-color: var(--attention-color); }
+.botao-amarelo:hover { background-color: #c7913a; }
+.botao-vermelho { background-color: var(--error-color); }
+.botao-vermelho:hover { background-color: #b22d3d; }
+
+.error-log-container { background-color: #111; padding: 15px; border-radius: 8px; margin-top: 15px; }
+.error-log-container h2 { color: var(--warning-color); font-size: 16px; margin-top: 0; }
+.error-log-container code { white-space: pre-wrap; display: block; font-family: monospace; color: #ccc; font-size: 12px; }
+
+.footer { text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--card-color); color: var(--secondary-color); font-size: 12px; }
+
+/* --- NOVO: ESTILO PARA O AVISO DE INATIVIDADE --- */
+.inactivity-warning {
+    background-color: var(--error-color); /* Fundo vermelho para alerta */
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    text-align: center;
+    box-shadow: 0 4px 8px var(--shadow-color);
 }
 
-/* Aplica a nova cor de preenchimento dos ícones */
-body.inactivity-warning-active .card .card-icon,
-body.inactivity-warning-active .summary-icon {
-    fill: var(--primary-color);
+.inactivity-warning h2 {
+    color: white;
+    margin: 0 0 10px 0;
+    font-size: 20px;
+    font-weight: 700;
 }
 
-/* Garante que o conteúdo esmaecido tenha o tom de erro */
+.warning-gif {
+    max-width: 150px; /* Tamanho razoável para o GIF */
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.inactivity-warning p {
+    margin: 5px 0;
+    font-size: 16px;
+    font-weight: 300;
+}
+
+.inactivity-warning .small-text {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-top: 10px;
+}
+
+/* Efeito de esmaecer e desabilitar cliques no restante do dashboard */
 body.inactivity-warning-active .grid-container,
 body.inactivity-warning-active .summary-card:not(#inactivity-message) {
     opacity: 0.3;
@@ -134,14 +172,7 @@ body.inactivity-warning-active .summary-card:not(#inactivity-message) {
 }
 
 /* Garante que o aviso não seja afetado pelo escurecimento */
-.inactivity-warning {
-    background-color: var(--error-color); 
-    color: white;
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 25px;
-    text-align: center;
-    box-shadow: 0 4px 8px var(--shadow-color);
+body.inactivity-warning-active .inactivity-warning {
     opacity: 1;
     pointer-events: all;
     transition: opacity 0.5s ease;
@@ -158,4 +189,7 @@ body.inactivity-warning-active .summary-card:not(#inactivity-message) {
     .card .value { font-size: 22px; }
     .card .value span { font-size: 12px; }
     .card h3 { font-size: 12px; }
+    .status-grid { grid-template-columns: 1fr 1fr; }
+    .botoes { justify-content: space-around; }
+    .botao { width: 45%; text-align: center; }
 }
