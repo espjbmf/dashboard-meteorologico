@@ -9,9 +9,8 @@ const firebaseConfig = {
     appId: "1:573048677136:web:86cae166c47daf024ebb95",
     measurementId: "G-SQXD1CTLX6"
 };
-
 // --- VARIÁVEIS DE CONTROLE DE INATIVIDADE ---
-// [ATUALIZADO] Inicializa com o tempo de carregamento da página.
+// Inicializa com o tempo de carregamento da página.
 let lastDataTimestamp = Date.now(); // Armazena o timestamp da última atualização (em ms) 
 // [AJUSTADO PARA TESTES] 6 minutos em milissegundos
 const INACTIVITY_LIMIT_MS = 6 * 60 * 1000; 
@@ -26,6 +25,11 @@ function elegerLider() {
     isLeader = true;
     channel.postMessage({ type: 'CLAIM_LEADERSHIP' });
     console.log("Esta aba está tentando se tornar a líder...");
+    
+    // [CORREÇÃO APLICADA] Força uma checagem de inatividade imediatamente,
+    // garantindo que, se já houver um problema no timestamp, ele seja processado.
+    checkForInactivity(); 
+    
     iniciarConexaoFirebase(); // Só o líder inicia a conexão
     startInactivityCheck(); // Inicia a checagem de inatividade (só no líder)
 }
@@ -52,6 +56,7 @@ channel.onmessage = (event) => {
     // Mensagem de inatividade da aba líder
     if (event.data.type === 'INACTIVITY_WARNING') {
         if (!isLeader) {
+            // Se o seguidor receber a mensagem, ele mostra o aviso.
             showInactivityWarning();
         }
     }
@@ -72,7 +77,7 @@ function startInactivityCheck() {
     if (inactivityCheckInterval) {
         clearInterval(inactivityCheckInterval);
     }
-    // Checa a cada 5 minutos (manter esse intervalo é bom)
+    // Checa a cada 5 minutos
     inactivityCheckInterval = setInterval(checkForInactivity, 5 * 60 * 1000); 
     console.log("Checagem de inatividade iniciada.");
 }
@@ -91,17 +96,16 @@ function checkForInactivity() {
     if (!isLeader) return; // Apenas o líder faz a checagem
 
     const currentTime = Date.now();
-    
-    // [CORREÇÃO APLICADA] Calcula a diferença de tempo diretamente.
     const timeSinceLastUpdate = currentTime - lastDataTimestamp; 
 
     if (timeSinceLastUpdate > INACTIVITY_LIMIT_MS) {
+        // Alerta de inatividade detectado.
         console.warn(`Alerta de Inatividade: Última atualização foi há ${Math.round(timeSinceLastUpdate / 60000)} minutos. (Limite: 6 min)`);
         showInactivityWarning();
         // Avisa outras abas para mostrar o aviso
         channel.postMessage({ type: 'INACTIVITY_WARNING' }); 
     } else {
-        // Se a inatividade foi resolvida, esconde o aviso e avisa os seguidores
+        // Se o tempo não passou, mas o aviso está ativo (estado 'stuck'), ele é rearmado.
         if (document.body.classList.contains('inactivity-warning-active')) {
             hideInactivityWarning();
             channel.postMessage({ type: 'DATA_RESUMED' });
@@ -118,7 +122,6 @@ function showInactivityWarning() {
     
     // Atualiza o tempo na mensagem de inatividade
     const date = new Date(lastDataTimestamp);
-    // [AJUSTE DE TEXTO] Correção do plural/singular na mensagem
     document.getElementById('inactivity-message').querySelector('p:nth-child(3)').textContent = 
         `A estação meteorológica não enviou novos dados nas últimas ${Math.round(INACTIVITY_LIMIT_MS / 60000)} minutos.`;
     document.getElementById('data-hora-inactivity').textContent = `Último dado recebido em: ${date.toLocaleTimeString()} de ${date.toLocaleDateString()}`;
@@ -137,12 +140,19 @@ function hideInactivityWarning() {
 function iniciarConexaoFirebase() {
     const app = firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
+    // [CORREÇÃO] Em vez de child_added (que só pega novos dados), use 'value' para obter o estado atual.
+    // Isso garante que a aba líder receba o dado atual imediatamente, corrigindo o timestamp.
     const latestDataRef = database.ref('dados').orderByKey().limitToLast(1);
 
-    latestDataRef.on('child_added', (snapshot) => {
+    latestDataRef.on('value', (snapshot) => {
+        if (!snapshot.exists()) return;
+
+        const latestDataObj = snapshot.val();
+        const pushId = Object.keys(latestDataObj)[0];
+        const latestData = latestDataObj[pushId];
+        
         if (isLeader) {
-            const latestData = snapshot.val();
-            console.log("Aba LÍDER recebeu novo dado do Firebase:", latestData);
+            console.log("Aba LÍDER recebeu dado (Value Event) do Firebase:", latestData);
             
             // Marca o recebimento do dado
             lastDataTimestamp = Date.now(); 
@@ -150,11 +160,15 @@ function iniciarConexaoFirebase() {
 
             atualizarPagina(latestData);
             channel.postMessage({ type: 'DATA_UPDATE', payload: latestData });
+        } else {
+             // O seguidor também pode usar o evento 'value' para atualizar seu timestamp interno
+             lastDataTimestamp = Date.now();
         }
     });
 }
 
-// --- FUNÇÕES DE ATUALIZAÇÃO E CÁLCULO (INALTERADAS) ---
+// --- FUNÇÕES DE ATUALIZAÇÃO E CÁLCULO (MANTIDAS) ---
+
 function atualizarPagina(data) {
     if (!data) return;
 
@@ -163,17 +177,14 @@ function atualizarPagina(data) {
     const pressao = parseFloat(data.pressao);
     const ventoKmh = parseFloat(data.velocidade_vento);
     
-    // NOVOS DADOS
     const luminosidade = parseFloat(data.luminosidade_lux);
     const indiceUV = parseFloat(data.indice_uv);
-    // FIM NOVOS DADOS
 
     const pontoDeOrvalho = calcularPontoOrvalho(temperatura, umidade);
     const sensacaoTermica = calcularSensacaoTermica(temperatura, umidade, ventoKmh);
     const { texto: potencialTexto, cor: potencialCor } = classificarPotencialEolico(ventoKmh);
-    const { texto: uvTexto, cor: uvCor } = classificarRiscoUV(indiceUV); // NOVO CÁLCULO
+    const { texto: uvTexto, cor: uvCor } = classificarRiscoUV(indiceUV); 
     
-    // Atualiza os valores PRINCIPAIS (sempre visíveis)
     document.getElementById('temp-externa-valor').innerHTML = temperatura.toFixed(1) + '<span> &deg;C</span>';
     document.getElementById('umid-valor').innerHTML = umidade.toFixed(1) + '<span> %</span>';
     document.getElementById('ponto-orvalho-valor').innerHTML = pontoDeOrvalho + '<span> &deg;C</span>';
@@ -182,10 +193,8 @@ function atualizarPagina(data) {
     document.getElementById('vento-valor').innerHTML = ventoKmh.toFixed(1) + '<span> km/h</span>';
     document.getElementById('dir-vento-valor').innerHTML = data.direcao_vento || '--';
     
-    // NOVO: Atualiza luminosidade
     document.getElementById('luminosidade-valor').innerHTML = luminosidade.toFixed(0) + '<span> Lux</span>';
 
-    // NOVO: Atualiza Índice UV
     const uvElement = document.getElementById('uv-valor');
     uvElement.textContent = uvTexto;
     uvElement.style.color = uvCor;
@@ -200,10 +209,8 @@ function atualizarPagina(data) {
     document.getElementById('summary-text').textContent = sumarioTexto;
     document.getElementById('summary-icon').querySelector('svg').innerHTML = icone;
 
-    // Atualiza os valores EXPANDIDOS (onde os dados são recebidos)
     preencherDescricoes(sumarioTexto, potencialTexto, uvTexto);
     
-    // MAX/MIN que SÃO RECEBIDOS:
     if (data.temp_max_dia) {
        document.getElementById('temp-max-dia').textContent = parseFloat(data.temp_max_dia).toFixed(1) + ' °C';
     }
@@ -226,7 +233,6 @@ function atualizarPagina(data) {
         document.getElementById('vento-max-dia').textContent = parseFloat(data.vento_max_dia).toFixed(1) + ' km/h';
     }
     
-    // NOVO: MAX UV (se vier a ser enviado)
     if (data.uv_max_dia) {
         document.getElementById('uv-max-dia').textContent = parseFloat(data.uv_max_dia).toFixed(1);
     }
@@ -257,7 +263,6 @@ function calcularSensacaoTermica(tempC, umidade, ventoKmh) {
 }
 
 function analisarCondicoes(temperatura, umidade, vento, pontoOrvalho) {
-    // Ícones SVG
     const ICONE_SOL = '<path d="M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8M12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,11H22V13H20V11M2,11H4V13H2V11M11,2V4H13V2H11M11,20V22H13V20H11Z" />';
     const ICONE_NEBLINA = '<path d="M7,15H17A5,5 0 0,0 12,10A5,5 0 0,0 7,15M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M5,17H19A3,3 0 0,0 16,14A3,3 0 0,0 13,17H11A3,3 0 0,0 8,14A3,3 0 0,0 5,17Z" />';
     const ICONE_VENTO = '<path d="M9.5,12.5L12.5,15.5L11,17L8,14M14.5,12.5L11.5,15.5L13,17L16,14M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z" />';
@@ -311,36 +316,29 @@ function classificarPotencialEolico(ventoKmh) {
     }
 }
 
-// NOVO: FUNÇÃO PARA CLASSIFICAR RISCO UV
 function classificarRiscoUV(indiceUV) {
     if (isNaN(indiceUV) || indiceUV < 0) return { texto: '--', cor: '#e1e1e1' };
     const valorUV = indiceUV.toFixed(1);
 
-    // Tabela de Risco UV (escala padrão mundial)
     if (indiceUV <= 2) {
-        return { texto: valorUV + ' (Baixo)', cor: '#28a745' }; // verde
+        return { texto: valorUV + ' (Baixo)', cor: '#28a745' }; 
     } else if (indiceUV <= 5) {
-        return { texto: valorUV + ' (Moderado)', cor: '#00bcd4' }; // azul (cor principal)
+        return { texto: valorUV + ' (Moderado)', cor: '#00bcd4' }; 
     } else if (indiceUV <= 7) {
-        return { texto: valorUV + ' (Alto)', cor: '#f0ad4e' }; // laranja
+        return { texto: valorUV + ' (Alto)', cor: '#f0ad4e' }; 
     } else if (indiceUV <= 10) {
-        return { texto: valorUV + ' (Muito Alto)', cor: '#dc3545' }; // vermelho
+        return { texto: valorUV + ' (Muito Alto)', cor: '#dc3545' }; 
     } else {
-        return { texto: valorUV + ' (Extremo)', cor: '#880088' }; // roxo
+        return { texto: valorUV + ' (Extremo)', cor: '#880088' }; 
     }
 }
 
-// --- FUNÇÃO PARA PREENCHER DESCRIÇÕES ESTÁTICAS E DINÂMICAS ---
 function preencherDescricoes(sumarioTexto, potencialTexto, uvTexto) {
-    // Descrições estáticas
     document.getElementById('orvalho-descricao').textContent = "Temperatura na qual o ar fica 100% saturado e a água se condensa, formando orvalho ou neblina.";
     document.getElementById('sensacao-descricao').textContent = "Percepção da temperatura pelo corpo humano, combinando ar, umidade e vento.";
     document.getElementById('direcao-descricao').textContent = "Indica a direção de onde o vento está a soprar (ex: 'N' = Vento Norte).";
-    
-    // NOVO: Descrição da Luminosidade
     document.getElementById('luminosidade-descricao').textContent = "Medida da intensidade de luz no ambiente (em lux). Um dia ensolarado pode chegar a 100.000 lux.";
 
-    // NOVO: Descrição do UV
     const descUV = {
         'Baixo': "Risco mínimo. Não é necessário proteção solar.",
         'Moderado': "Risco baixo. Use protetor solar se passar muito tempo ao ar livre.",
@@ -348,12 +346,9 @@ function preencherDescricoes(sumarioTexto, potencialTexto, uvTexto) {
         'Muito Alto': "Risco alto. Evite exposição ao sol entre 10h e 16h.",
         'Extremo': "Risco muito alto. Evite o sol completamente. Proteção máxima necessária."
     };
-    // Pega a classificação entre parênteses
     const classificacaoUV = uvTexto.includes('(') ? uvTexto.match(/\((.*?)\)/)[1] : uvTexto;
     document.getElementById('uv-descricao').textContent = descUV[classificacaoUV] || "Nível de radiação ultravioleta.";
 
-
-    // Descrições dinâmicas
     const descSumario = {
         "Neblina / Cerração": "Visibilidade reduzida. O ar está saturado de umidade e a temperatura é igual ao ponto de orvalho.",
         "Ventania": "Ventos fortes. Risco de queda de objetos e poeira.",
@@ -386,17 +381,13 @@ function preencherDescricoes(sumarioTexto, potencialTexto, uvTexto) {
 
 // --- LÓGICA PARA TORNAR OS CARDS EXPANSÍVEIS ---
 document.addEventListener('DOMContentLoaded', () => {
-    // Seleciona TODOS os elementos que têm a classe ".card"
     const cards = document.querySelectorAll('.card');
 
     cards.forEach(card => {
-        // Encontra o cabeçalho (.card-header) dentro de cada card
         const header = card.querySelector('.card-header');
         
         if (header) {
-            // Adiciona um "ouvinte de clique" a este cabeçalho
             header.addEventListener('click', () => {
-                // Adiciona ou remove a classe "expanded" do card pai
                 card.classList.toggle('expanded');
             });
         }
