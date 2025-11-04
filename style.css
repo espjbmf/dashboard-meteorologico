@@ -43,7 +43,7 @@ header h1 { margin: 0; color: var(--primary-color); font-weight: 300; font-size:
 .card .value { font-size: 28px; font-weight: 700; color: var(--text-color); }
 .card .value span { font-size: 16px; font-weight: 300; color: var(--secondary-color); }
 
-/* --- NOVOS ESTILOS PARA EXPANSÃO --- */
+/* --- ESTILOS PARA EXPANSÃO --- */
 
 .card .card-header {
     display: flex;
@@ -125,6 +125,59 @@ header h1 { margin: 0; color: var(--primary-color); font-weight: 300; font-size:
 .error-log-container code { white-space: pre-wrap; display: block; font-family: monospace; color: #ccc; font-size: 12px; }
 
 .footer { text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--card-color); color: var(--secondary-color); font-size: 12px; }
+
+/* --- NOVO: ESTILO PARA O AVISO DE INATIVIDADE --- */
+.inactivity-warning {
+    background-color: var(--error-color); /* Fundo vermelho para alerta */
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    text-align: center;
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.inactivity-warning h2 {
+    color: white;
+    margin: 0 0 10px 0;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.warning-gif {
+    max-width: 150px; /* Tamanho razoável para o GIF */
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.inactivity-warning p {
+    margin: 5px 0;
+    font-size: 16px;
+    font-weight: 300;
+}
+
+.inactivity-warning .small-text {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-top: 10px;
+}
+
+/* Efeito de esmaecer e desabilitar cliques no restante do dashboard */
+body.inactivity-warning-active .grid-container,
+body.inactivity-warning-active .summary-card:not(#inactivity-message) {
+    opacity: 0.3;
+    pointer-events: none; 
+    transition: opacity 0.5s ease;
+}
+
+/* Garante que o aviso não seja afetado pelo escurecimento */
+body.inactivity-warning-active .inactivity-warning {
+    opacity: 1;
+    pointer-events: all;
+    transition: opacity 0.5s ease;
+}
+/* FIM: NOVO ESTILO PARA O AVISO DE INATIVIDADE */
 
 @media (max-width: 600px) {
     .summary-card .card-header { flex-direction: column; gap: 10px; }
