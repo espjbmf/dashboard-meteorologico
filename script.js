@@ -9,9 +9,8 @@ const firebaseConfig = {
     appId: "1:573048677136:web:86cae166c47daf024ebb95",
     measurementId: "G-SQXD1CTLX6"
 };
-
 // --- VARIÁVEIS DE CONTROLE DE INATIVIDADE ---
-// Inicializa com o tempo de carregamento da página para começar a contagem de inatividade.
+// Inicializa com o tempo de carregamento da página.
 let lastDataTimestamp = Date.now(); // Armazena o timestamp da última atualização (em ms) 
 // [AJUSTADO PARA TESTES] 6 minutos em milissegundos
 const INACTIVITY_LIMIT_MS = 6 * 60 * 1000; 
@@ -27,7 +26,8 @@ function elegerLider() {
     channel.postMessage({ type: 'CLAIM_LEADERSHIP' });
     console.log("Esta aba está tentando se tornar a líder...");
     
-    // Força uma checagem de inatividade imediata para resolver o problema de "piscada".
+    // [CORREÇÃO APLICADA] Força uma checagem de inatividade imediatamente,
+    // garantindo que, se já houver um problema no timestamp, ele seja processado.
     checkForInactivity(); 
     
     iniciarConexaoFirebase(); // Só o líder inicia a conexão
@@ -36,27 +36,31 @@ function elegerLider() {
 
 channel.onmessage = (event) => {
     if (event.data.type === 'CLAIM_LEADERSHIP') {
-        if(isLeader) return; 
+        if(isLeader) return; // Ignora a própria mensagem
         console.log("Outra aba já é a líder. Esta aba será uma seguidora.");
         isLeader = false;
         clearTimeout(leaderCheckTimeout);
         document.getElementById('summary-text').textContent = "Dados exibidos pela aba principal.";
-        stopInactivityCheck(); 
+        stopInactivityCheck(); // Para a checagem no seguidor
     }
     if (event.data.type === 'DATA_UPDATE') {
+        // Atualiza o timestamp para ambas as abas
         lastDataTimestamp = Date.now(); 
-        hideInactivityWarning(); 
+        hideInactivityWarning(); // Esconde aviso se houver dado
         
         if (!isLeader) {
             console.log("Dados recebidos da aba líder.", event.data.payload);
             atualizarPagina(event.data.payload);
         }
     }
+    // Mensagem de inatividade da aba líder
     if (event.data.type === 'INACTIVITY_WARNING') {
         if (!isLeader) {
+            // Se o seguidor receber a mensagem, ele mostra o aviso.
             showInactivityWarning();
         }
     }
+    // Mensagem de retorno da aba líder
     if (event.data.type === 'DATA_RESUMED') {
         if (!isLeader) {
             hideInactivityWarning();
@@ -68,14 +72,17 @@ leaderCheckTimeout = setTimeout(elegerLider, Math.random() * 200 + 50);
 
 // --- LÓGICA DE CHECAGEM DE INATIVIDADE ---
 
+/** Inicia o timer de checagem (somente no líder) */
 function startInactivityCheck() {
     if (inactivityCheckInterval) {
         clearInterval(inactivityCheckInterval);
     }
+    // Checa a cada 5 minutos
     inactivityCheckInterval = setInterval(checkForInactivity, 5 * 60 * 1000); 
     console.log("Checagem de inatividade iniciada.");
 }
 
+/** Para o timer de checagem (para não líderes) */
 function stopInactivityCheck() {
     if (inactivityCheckInterval) {
         clearInterval(inactivityCheckInterval);
@@ -84,17 +91,21 @@ function stopInactivityCheck() {
     console.log("Checagem de inatividade parada.");
 }
 
+/** Função principal que verifica se a última atualização foi há mais de 6 minutos */
 function checkForInactivity() {
-    if (!isLeader) return; 
+    if (!isLeader) return; // Apenas o líder faz a checagem
 
     const currentTime = Date.now();
     const timeSinceLastUpdate = currentTime - lastDataTimestamp; 
 
     if (timeSinceLastUpdate > INACTIVITY_LIMIT_MS) {
+        // Alerta de inatividade detectado.
         console.warn(`Alerta de Inatividade: Última atualização foi há ${Math.round(timeSinceLastUpdate / 60000)} minutos. (Limite: 6 min)`);
         showInactivityWarning();
+        // Avisa outras abas para mostrar o aviso
         channel.postMessage({ type: 'INACTIVITY_WARNING' }); 
     } else {
+        // Se o tempo não passou, mas o aviso está ativo (estado 'stuck'), ele é rearmado.
         if (document.body.classList.contains('inactivity-warning-active')) {
             hideInactivityWarning();
             channel.postMessage({ type: 'DATA_RESUMED' });
@@ -102,22 +113,25 @@ function checkForInactivity() {
     }
 }
 
+/** Mostra a mensagem de aviso na tela */
 function showInactivityWarning() {
-    // [NOVO TEMA] Adiciona a classe que muda o tema no CSS para vermelho
     document.body.classList.add('inactivity-warning-active');
     document.getElementById('inactivity-message').style.display = 'block';
+    // Opcional: Altera o texto do sumário
     document.getElementById('summary-text').textContent = "Problemas Técnicos";
     
+    // Atualiza o tempo na mensagem de inatividade
     const date = new Date(lastDataTimestamp);
     document.getElementById('inactivity-message').querySelector('p:nth-child(3)').textContent = 
         `A estação meteorológica não enviou novos dados nas últimas ${Math.round(INACTIVITY_LIMIT_MS / 60000)} minutos.`;
     document.getElementById('data-hora-inactivity').textContent = `Último dado recebido em: ${date.toLocaleTimeString()} de ${date.toLocaleDateString()}`;
 }
 
+/** Esconde a mensagem de aviso */
 function hideInactivityWarning() {
-    // [NOVO TEMA] Remove a classe, voltando ao tema original
     document.body.classList.remove('inactivity-warning-active');
     document.getElementById('inactivity-message').style.display = 'none';
+    // Volta o texto do sumário ao original (será reescrito pela próxima atualização)
     document.getElementById('summary-text').textContent = "Aguardando dados...";
 }
 
@@ -126,6 +140,8 @@ function hideInactivityWarning() {
 function iniciarConexaoFirebase() {
     const app = firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
+    // [CORREÇÃO] Em vez de child_added (que só pega novos dados), use 'value' para obter o estado atual.
+    // Isso garante que a aba líder receba o dado atual imediatamente, corrigindo o timestamp.
     const latestDataRef = database.ref('dados').orderByKey().limitToLast(1);
 
     latestDataRef.on('value', (snapshot) => {
@@ -138,16 +154,18 @@ function iniciarConexaoFirebase() {
         if (isLeader) {
             console.log("Aba LÍDER recebeu dado (Value Event) do Firebase:", latestData);
             
+            // Marca o recebimento do dado
             lastDataTimestamp = Date.now(); 
-            hideInactivityWarning(); 
+            hideInactivityWarning(); // Esconde aviso se houver novo dado
+
             atualizarPagina(latestData);
             channel.postMessage({ type: 'DATA_UPDATE', payload: latestData });
         } else {
+             // O seguidor também pode usar o evento 'value' para atualizar seu timestamp interno
              lastDataTimestamp = Date.now();
         }
     });
 }
-
 
 // --- FUNÇÕES DE ATUALIZAÇÃO E CÁLCULO (MANTIDAS) ---
 
@@ -187,7 +205,7 @@ function atualizarPagina(data) {
     
     document.getElementById('data-hora').textContent = 'Última atualização: ' + data.timestamp;
 
-    const { texto: sumarioTexto, icone } = analisarCondicoes(temperatura, umidade, ventoKmh, pontoOrvalho);
+    const { texto: sumarioTexto, icone } = analisarCondicoes(temperatura, umidade, ventoKmh, pontoDeOrvalho);
     document.getElementById('summary-text').textContent = sumarioTexto;
     document.getElementById('summary-icon').querySelector('svg').innerHTML = icone;
 
@@ -278,7 +296,7 @@ function analisarCondicoes(temperatura, umidade, vento, pontoOrvalho) {
         return (umidade > 80)
             ? { texto: "Frio e Úmido", icone: ICONE_FRIO }
             : { texto: "Tempo Frio", icone: ICONE_FRIO };
-    } else { 
+    } else { // Abaixo de 5°C
         return (umidade > 80)
             ? { texto: "Muito Frio e Úmido", icone: ICONE_FRIO }
             : { texto: "Muito Frio", icone: ICONE_FRIO };
