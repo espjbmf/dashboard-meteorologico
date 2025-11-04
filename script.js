@@ -10,7 +10,7 @@ const firebaseConfig = {
     measurementId: "G-SQXD1CTLX6"
 };
 // --- VARIÁVEIS DE CONTROLE DE INATIVIDADE ---
-// Inicializa com o tempo de carregamento da página.
+// Inicializa com o tempo de carregamento da página para começar a contagem de inatividade.
 let lastDataTimestamp = Date.now(); 
 // [AJUSTADO PARA TESTES] 6 minutos em milissegundos
 const INACTIVITY_LIMIT_MS = 6 * 60 * 1000; 
@@ -21,52 +21,16 @@ const channel = new BroadcastChannel('estacao_meteorologica_channel');
 let isLeader = false;
 let leaderCheckTimeout;
 
-// ==========================================================
-// INICIALIZAÇÃO E SINCRONIZAÇÃO DE ALERTA FIREBASE (NOVO PONTO DE ENTRADA)
-// ==========================================================
-
-/** * [SOLUÇÃO MÓVEL] Verifica o estado de inatividade no Firebase antes de 
- * iniciar a liderança. Garante que o alerta aparece imediatamente no celular.
- */
-function verificarEstadoDoAlertaFirebase() {
-    // Inicializa o Firebase (isso só acontece uma vez)
-    const app = firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-    // A função monitorarStatusDaEstacao da Cloud Function escreve neste caminho
-    const alertaRef = database.ref('/alertas/offlineAtivo');
-
-    alertaRef.once('value', (snapshot) => {
-        const isOffline = snapshot.val(); 
-        
-        if (isOffline === true) {
-            console.warn("[SYNC] Cloud Function marcou: Estação OFFLINE. Mostrando aviso.");
-            showInactivityWarning(); 
-        } else {
-             console.log("[SYNC] Cloud Function marcou: Estação ONLINE.");
-        }
-        
-        // INICIA A ELEIÇÃO SÓ APÓS VERIFICAR O ESTADO
-        leaderCheckTimeout = setTimeout(elegerLider, Math.random() * 200 + 50);
-    });
-}
-
-// O NOVO PONTO DE ENTRADA DO SCRIPT
-verificarEstadoDoAlertaFirebase(); 
-
-
-// ==========================================================
-// FUNÇÕES DE LIDERANÇA E CHECAGEM 
-// ==========================================================
-
 function elegerLider() {
     isLeader = true;
     channel.postMessage({ type: 'CLAIM_LEADERSHIP' });
     console.log("Esta aba está tentando se tornar a líder...");
     
+    // [CORREÇÃO APLICADA] Força uma checagem imediata para resolver o problema de "piscada" do alerta.
     checkForInactivity(); 
     
-    iniciarConexaoFirebase();
-    startInactivityCheck(); 
+    iniciarConexaoFirebase(); // Só o líder inicia a conexão
+    startInactivityCheck(); // Inicia a checagem de inatividade (só no líder)
 }
 
 channel.onmessage = (event) => {
@@ -99,12 +63,16 @@ channel.onmessage = (event) => {
     }
 };
 
+// [PONTO DE ENTRADA ORIGINAL] Começa a eleição de líder com um pequeno delay aleatório.
+leaderCheckTimeout = setTimeout(elegerLider, Math.random() * 200 + 50);
+
 // --- LÓGICA DE CHECAGEM DE INATIVIDADE ---
 
 function startInactivityCheck() {
     if (inactivityCheckInterval) {
         clearInterval(inactivityCheckInterval);
     }
+    // Checa a cada 5 minutos
     inactivityCheckInterval = setInterval(checkForInactivity, 5 * 60 * 1000); 
     console.log("Checagem de inatividade iniciada.");
 }
@@ -153,20 +121,10 @@ function hideInactivityWarning() {
 }
 
 
-// --- LÓGICA DO FIREBASE (CORRIGIDA) ---
-
+// --- LÓGICA DO FIREBASE (ORIGINAL E FUNCIONAL) ---
 function iniciarConexaoFirebase() {
-    // [CORREÇÃO APLICADA] Reutiliza a instância do Firebase já inicializada.
-    const app = firebase.apps[0]; 
-    
-    if (!app) {
-        console.error("Firebase App não encontrado! Falha na inicialização.");
-        // Se a inicialização falhou acima, tenta novamente (como último recurso)
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-    }
-    
+    // [REVERTIDO] Inicializa o Firebase aqui, garantindo que o listener funcione.
+    const app = firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
     const latestDataRef = database.ref('dados').orderByKey().limitToLast(1);
 
@@ -183,11 +141,13 @@ function iniciarConexaoFirebase() {
         if (isLeader) {
             console.log("Aba LÍDER recebeu dado (Value Event) do Firebase:", latestData);
             
+            // Marca o recebimento do dado
             lastDataTimestamp = Date.now(); 
             hideInactivityWarning(); 
             atualizarPagina(latestData);
             channel.postMessage({ type: 'DATA_UPDATE', payload: latestData });
         } else {
+             // Se não for o líder, atualiza o timestamp e espera o BroadcastChannel
              lastDataTimestamp = Date.now();
         }
     });
