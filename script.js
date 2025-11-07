@@ -13,7 +13,7 @@ const firebaseConfig = {
 // Inicializa com o tempo de carregamento da página.
 let lastDataTimestamp = Date.now(); // Armazena o timestamp da última atualização (em ms) 
 // [AJUSTADO PARA TESTES] 6 minutos em milissegundos
-const INACTIVITY_LIMIT_MS = 6 * 60 * 1000; 
+const INACTIVITY_LIMIT_MS = 60 * 60 * 1000; 
 let inactivityCheckInterval;
 
 // --- LÓGICA DE CONTROLE DE ABAS (Broadcast Channel) ---
@@ -393,3 +393,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
