@@ -1,28 +1,40 @@
-:root {
-    /* --- PALETA QUARESMA SÓBRIA --- */
-    /* Fundo muito escuro, quase preto com um toque imperceptível de violeta */
-    --bg-color: #121014; 
-    
-    /* Cor dos cards: Um cinza-arroxeado escuro e profundo */
-    --card-color: #1e1b24; 
-    
-    /* Texto principal: Um branco sujo/acinzentado para não cansar a vista */
-    --text-color: #e0dce6; 
-    
-    /* COR PRINCIPAL: Roxo Litúrgico Sóbrio (Substitui o Ciano) */
-    /* Usado para ícones, bordas de destaque e títulos */
-    --primary-color: #7b3f6b; 
-    
-    /* Cor secundária: Cinza "Cinzas" para detalhes e subtítulos */
-    --secondary-color: #938a99; 
-    
-    --shadow-color: rgba(0, 0, 0, 0.7);
+/* TEMA: QUARESMA (SOBRIEDADE E REFLEXÃO)
+   ESTRUTURA: BASEADA NO DASHBOARD ORIGINAL
+*/
 
-    /* Cores de Status (Tons mais fechados e terrosos) */
-    --success-color: #388e3c; /* Verde Musgo Escuro */
-    --warning-color: #d87c1c; /* Âmbar/Laranja Queimado */
-    --error-color: #c62828;   /* Vermelho Carmesim Profundo */
-    --attention-color: #d87c1c;
+:root {
+    --bg-color: #0f0d11; /* Fundo "Noite de Vigília" */
+    --card-color: #1a171e; /* Cinza-roxo profundo */
+    --text-color: #d1cbd6; /* Branco acinzentado */
+    --primary-color: #7b3f6b; /* Roxo Litúrgico Sóbrio */
+    --secondary-color: #88808d; /* Cor de Cinzas */
+    --shadow-color: rgba(0, 0, 0, 0.6);
+    
+    /* Status Muted (Cores menos vibrantes para respeitar o tema) */
+    --success-color: #436d45; 
+    --warning-color: #a67c37;
+    --error-color: #8b3a3a;
+    --attention-color: #a67c37;
+}
+
+/* --- EFEITO DE CINZAS FLUTUANTES NO FUNDO --- */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: 
+        radial-gradient(circle, var(--secondary-color) 1px, transparent 1px),
+        radial-gradient(circle, #444 1px, transparent 1px);
+    background-size: 80px 80px, 150px 150px;
+    animation: particles 20s linear infinite;
+    opacity: 0.15;
+    z-index: -1;
+    pointer-events: none;
+}
+
+@keyframes particles {
+    0% { background-position: 0 0; }
+    100% { background-position: 50px 1000px; }
 }
 
 body {
@@ -36,8 +48,6 @@ body {
     align-items: flex-start;
     min-height: 100vh;
     box-sizing: border-box;
-    /* Adicionei um padrão de fundo sutil para textura, se desejar (opcional) */
-    /* background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232a2030' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); */
 }
 
 .container { width: 100%; max-width: 850px; }
@@ -45,7 +55,6 @@ body {
 header { 
     text-align: center; 
     margin-bottom: 25px; 
-    /* A borda agora usa o roxo sóbrio */
     border-bottom: 1px solid var(--primary-color); 
     padding-bottom: 15px; 
 }
@@ -55,114 +64,106 @@ header h1 {
     color: var(--primary-color); 
     font-weight: 300; 
     font-size: 24px; 
-    letter-spacing: 1px; 
+    letter-spacing: 2px; 
     text-transform: uppercase; 
 }
 
-/* Layout original do Sumário */
+/* CARD DE SUMÁRIO */
 .summary-card { 
     background-color: var(--card-color); 
-    border-radius: 10px; 
+    border-radius: 12px; 
     padding: 20px; 
     text-align: center; 
-    margin-bottom: 25px; 
+    margin-bottom: 20px; 
     position: relative; 
     cursor: pointer; 
-    user-select: none; 
     display: flex; 
     flex-direction: column; 
     align-items: center;
-    /* Adicionei uma borda sutil para definição */
     border: 1px solid rgba(123, 63, 107, 0.2);
-    box-shadow: 0 4px 8px var(--shadow-color);
+    box-shadow: 0 4px 15px var(--shadow-color);
 }
 
-.summary-card .card-header { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 20px; width: 100%; }
-.summary-icon { width: 60px; height: 60px; fill: var(--primary-color); }
-.summary-text { font-size: 24px; font-weight: 300; margin: 0; color: var(--text-color); margin-top: 10px; }
+.summary-icon { 
+    width: 55px; height: 55px; 
+    fill: var(--primary-color); 
+    filter: drop-shadow(0 0 5px rgba(123, 63, 107, 0.3));
+}
 
-.grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
+.summary-text { font-size: 22px; font-weight: 300; margin-top: 10px; color: var(--text-color); }
 
-/* ESTILOS DOS CARDS INDIVIDUAIS */
+/* GRID ADAPTADO PARA CELULAR (2 COLUNAS) */
+.grid-container { 
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 12px; 
+    margin-bottom: 20px; 
+}
+
+/* CARDS INDIVIDUAIS */
 .card { 
     background-color: var(--card-color); 
     border-radius: 10px; 
-    padding: 20px 15px; 
+    padding: 18px 10px; 
     text-align: center; 
-    transition: transform 0.3s ease, border-color 0.3s ease; 
+    transition: all 0.3s ease; 
     position: relative; 
     cursor: pointer; 
-    user-select: none; 
     display: flex; 
     flex-direction: column; 
     align-items: center; 
-    justify-content: flex-start; 
-    border: 1px solid transparent; /* Prepara para o hover */
-    box-shadow: 0 2px 5px var(--shadow-color);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Hover sutil no estilo do primeiro CSS */
 .card:hover {
     border-color: var(--primary-color);
-    transform: translateY(-2px);
+    background-color: #211e26;
 }
 
-.card .card-icon { width: 35px; height: 35px; fill: var(--primary-color); margin-bottom: 10px; }
-.card h3 { margin: 0 0 8px 0; color: var(--secondary-color); font-weight: 400; font-size: 14px; text-transform: uppercase; }
-.card .value { font-size: 28px; font-weight: 700; color: var(--text-color); }
-.card .value span { font-size: 16px; font-weight: 300; color: var(--secondary-color); }
+.card .card-icon { width: 32px; height: 32px; fill: var(--primary-color); margin-bottom: 8px; }
+.card h3 { margin: 0 0 6px 0; color: var(--secondary-color); font-weight: 400; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+.card .value { font-size: 24px; font-weight: 700; color: var(--text-color); }
+.card .value span { font-size: 14px; font-weight: 300; color: var(--secondary-color); }
 
-/* --- ESTILOS PARA EXPANSÃO (Mantidos do original) --- */
-
-.card .card-header { display: flex; flex-direction: column; align-items: center; width: 100%; }
-
+/* EXPANSÃO */
 .card-grip-icon {
-    position: absolute; bottom: 8px; right: 12px; width: 18px; height: 18px;
-    color: var(--secondary-color); opacity: 0.3; transition: opacity 0.3s ease, transform 0.3s ease;
+    position: absolute; bottom: 6px; right: 10px; width: 16px; height: 16px;
+    color: var(--primary-color); opacity: 0.4;
 }
-.card:hover .card-grip-icon { opacity: 0.7; }
 
 .card-content {
     max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; width: 100%;
-    font-size: 0.9rem; color: var(--secondary-color); line-height: 1.6; text-align: left; margin-top: 0; padding-top: 0;
+    font-size: 0.85rem; color: var(--secondary-color); text-align: left;
 }
-.card-content p { font-size: 0.95rem; color: var(--secondary-color); margin: 8px 0 0 0; font-weight: 300; }
-.card-content span { color: var(--text-color); font-weight: 500; }
 
 .card.expanded .card-content {
-    max-height: 200px; margin-top: 15px; padding-top: 15px;
-    border-top: 1px solid rgba(123, 63, 107, 0.3); /* Divisória roxa sutil */
-    transition: max-height 0.4s ease-in, margin-top 0.4s ease-in;
+    max-height: 200px; margin-top: 12px; padding-top: 12px;
+    border-top: 1px solid rgba(123, 63, 107, 0.2);
 }
-.card.expanded .card-grip-icon { transform: rotate(135deg); opacity: 0.8; color: var(--primary-color); }
 
-/* AVISO DE INATIVIDADE (Adaptado para cores mais fechadas) */
+.card.expanded .card-grip-icon { transform: rotate(135deg); opacity: 1; }
+
+/* AVISO DE INATIVIDADE */
 .inactivity-warning {
-    background-color: #3e1a1a; /* Fundo vermelho bem escuro/sangue seco */
+    background-color: #2a1515;
     border: 1px solid var(--error-color);
-    color: #e0dce6;
-    padding: 20px; border-radius: 10px; margin-bottom: 25px; text-align: center;
-    box-shadow: 0 4px 8px var(--shadow-color);
+    padding: 20px; border-radius: 10px; margin-bottom: 20px; text-align: center;
 }
-.inactivity-warning h2 { color: #ffb3b3; margin: 0 0 10px 0; font-size: 20px; font-weight: 700; }
-.warning-gif { max-width: 150px; height: auto; border-radius: 8px; margin-bottom: 15px; opacity: 0.8; }
-.inactivity-warning p { margin: 5px 0; font-size: 16px; font-weight: 300; }
-.inactivity-warning .small-text { font-size: 12px; opacity: 0.7; margin-top: 10px; color: var(--secondary-color); }
+.inactivity-warning h2 { color: #d68d8d; font-size: 18px; margin: 0; }
+.warning-gif { max-width: 120px; filter: grayscale(100%) sepia(50%) hue-rotate(310deg); margin-bottom: 10px; }
 
-body.inactivity-warning-active .grid-container,
-body.inactivity-warning-active .summary-card:not(#inactivity-message) { opacity: 0.2; pointer-events: none; transition: opacity 0.5s ease; filter: grayscale(80%); }
-body.inactivity-warning-active .inactivity-warning { opacity: 1; pointer-events: all; transition: opacity 0.5s ease; }
+/* STATUS DO SISTEMA */
+.system-status-card { grid-column: 1 / -1; background-color: var(--card-color); border-radius: 10px; padding: 15px; border: 1px solid #222; }
+.status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-.footer { text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px solid rgba(123, 63, 107, 0.2); color: var(--secondary-color); font-size: 12px; }
+.footer { 
+    text-align: center; margin-top: 25px; padding-top: 15px; 
+    border-top: 1px solid rgba(123, 63, 107, 0.2); 
+    color: var(--secondary-color); font-size: 11px; 
+}
 
-@media (max-width: 600px) {
-    .summary-card .card-header { flex-direction: column; gap: 10px; }
-    .summary-text { font-size: 20px; }
-    .summary-icon { width: 50px; height: 50px; }
-    .summary-card .card-grip-icon { top: 8px; right: 8px; width: 18px; height: 18px; }
-    .grid-container { grid-template-columns: 1fr 1fr; gap: 10px; }
-    .card { padding: 15px 10px; }
-    .card .value { font-size: 22px; }
-    .card .value span { font-size: 12px; }
-    .card h3 { font-size: 12px; }
+/* AJUSTES PARA DESKTOP */
+@media (min-width: 601px) {
+    .grid-container { grid-template-columns: repeat(3, 1fr); }
+    .card .value { font-size: 28px; }
 }
