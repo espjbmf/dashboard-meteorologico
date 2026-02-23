@@ -1,19 +1,23 @@
 :root {
-    --bg-color: #1a1c20; /* Fundo escuro principal */
-    --card-color: #25282e; /* Cor escura dos cards */
-    --text-color: #e1e1e1; /* Cor do valor principal (branco/claro) */
-    --primary-color: #00bcd4; /* Ciano/Azul (para ícones e destaque) */
-    --secondary-color: #8a8d93; /* Cinza (para títulos e detalhes) */
-    --shadow-color: rgba(0, 0, 0, 0.4);
-    --success-color: #28a745;
-    --warning-color: #f0ad4e;
-    --error-color: #dc3545;
-    --attention-color: #f0ad4e;
+    /* Paleta Tecnológica Vibrante */
+    --bg-color: #05060a; /* Fundo "Deep Space" */
+    --card-color: rgba(20, 22, 32, 0.8); /* Efeito de vidro escuro */
+    --text-color: #ffffff; 
+    --primary-color: #00f2ff; /* Azul Elétrico / Neon Cyan */
+    --accent-color: #7000ff;  /* Roxo Neon */
+    --secondary-color: #94a3b8; /* Cinza azulado metálico */
+    --shadow-color: rgba(0, 242, 255, 0.15);
+    
+    /* Cores de Status Vibrantes */
+    --success-color: #39ff14; /* Verde Neon */
+    --warning-color: #ffea00; /* Amarelo Elétrico */
+    --error-color: #ff0055;   /* Rosa Choque / Vermelho Cyber */
+    --attention-color: #ff9d00;
 }
 
 body {
-    font-family: 'Roboto', sans-serif;
-    background-color: var(--bg-color);
+    font-family: 'Inter', 'Roboto', sans-serif; /* Inter é mais moderna */
+    background: radial-gradient(circle at top right, #0d1117, #05060a);
     color: var(--text-color);
     margin: 0;
     padding: 15px;
@@ -25,171 +29,174 @@ body {
 }
 
 .container { width: 100%; max-width: 850px; }
-header { text-align: center; margin-bottom: 25px; border-bottom: 1px solid var(--primary-color); padding-bottom: 15px; }
-header h1 { margin: 0; color: var(--primary-color); font-weight: 300; font-size: 24px; letter-spacing: 1px; text-transform: uppercase; }
 
-/* Layout original do Sumário */
-.summary-card { background-color: var(--card-color); border-radius: 10px; padding: 20px; text-align: center; margin-bottom: 25px; position: relative; cursor: pointer; user-select: none; display: flex; flex-direction: column; align-items: center; }
-.summary-card .card-header { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 20px; width: 100%; }
-.summary-icon { width: 60px; height: 60px; fill: var(--primary-color); }
-.summary-text { font-size: 24px; font-weight: 300; margin: 0; color: var(--text-color); margin-top: 10px; }
-
-.grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
-
-/* ESTILOS DOS CARDS INDIVIDUAIS */
-.card { background-color: var(--card-color); border-radius: 10px; padding: 20px 15px; text-align: center; transition: transform 0.3s ease; position: relative; cursor: pointer; user-select: none; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
-.card .card-icon { width: 35px; height: 35px; fill: var(--primary-color); margin-bottom: 10px; }
-.card h3 { margin: 0 0 8px 0; color: var(--secondary-color); font-weight: 400; font-size: 14px; text-transform: uppercase; }
-.card .value { font-size: 28px; font-weight: 700; color: var(--text-color); }
-.card .value span { font-size: 16px; font-weight: 300; color: var(--secondary-color); }
-
-/* --- ESTILOS PARA EXPANSÃO --- */
-
-.card .card-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
+header { 
+    text-align: center; 
+    margin-bottom: 25px; 
+    border-bottom: 2px solid;
+    border-image: linear-gradient(to right, transparent, var(--primary-color), transparent) 1;
+    padding-bottom: 15px; 
 }
 
-/* O ícone de "grip" (três linhas inclinadas) */
-.card-grip-icon {
-    position: absolute;
-    bottom: 8px; 
-    right: 12px;
-    width: 18px;
-    height: 18px;
-    color: var(--secondary-color);
-    opacity: 0.3; /* Sutil por padrão */
-    transition: opacity 0.3s ease, transform 0.3s ease;
+header h1 { 
+    margin: 0; 
+    color: var(--primary-color); 
+    font-weight: 700; 
+    font-size: 26px; 
+    letter-spacing: 3px; 
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
 }
 
-.card:hover .card-grip-icon { opacity: 0.7; }
+/* --- CARDS COM EFEITO TECNOLÓGICO --- */
 
-/* Conteúdo escondido */
-.card-content {
-    max-height: 0;
+.summary-card, .card {
+    background: var(--card-color);
+    backdrop-filter: blur(10px); /* Efeito de vidro */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+    position: relative;
     overflow: hidden;
-    transition: max-height 0.4s ease-out;
-    width: 100%;
-    font-size: 0.9rem;
-    color: var(--secondary-color);
-    line-height: 1.6;
-    text-align: left; /* Alinha o conteúdo à esquerda */
-    margin-top: 0;
-    padding-top: 0;
 }
 
-.card-content p {
-    font-size: 0.95rem; 
-    color: var(--secondary-color);
-    margin: 8px 0 0 0;
-    font-weight: 300;
-}
-.card-content span { color: var(--text-color); font-weight: 500; }
-
-/* Estado "Expandido" */
-.card.expanded .card-content {
-    max-height: 200px;
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #333;
-    transition: max-height 0.4s ease-in, margin-top 0.4s ease-in;
+/* Linha de brilho no topo do card */
+.card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
 }
 
-/* Rotação do ícone de grip (Fica como um "X" quando expande) */
-.card.expanded .card-grip-icon {
-    transform: rotate(135deg);
-    opacity: 0.8;
+.summary-card { 
+    border-radius: 15px; 
+    padding: 25px; 
+    text-align: center; 
+    margin-bottom: 25px; 
+    border: 1px solid rgba(0, 242, 255, 0.3);
 }
 
-/* Estilos de Status do Sistema (Não alterados) */
-.system-status-card { grid-column: 1 / -1; padding: 10px 15px; margin-top: 10px; background-color: var(--card-color); border-radius: 10px; }
-.system-status-card h2 { text-align: center; color: var(--primary-color); font-weight: 300; font-size: 18px; margin: 0 0 15px 0; border-bottom: 1px solid #444; padding-bottom: 10px; }
-.status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; text-align: center; }
-.status-item h3 { font-size: 13px; margin: 0 0 2px 0; color: var(--secondary-color); }
-.status-item .value { font-size: 18px; font-weight: 700; color: var(--text-color); }
-.status-item .value span { font-size: 12px; color: var(--secondary-color); }
-.status-item .value.ok { color: var(--success-color); } .value.attention { color: var(--attention-color); } .value.error { color: var(--error-color); }
-
-.botoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 25px; }
-.botao { text-decoration: none; padding: 12px 20px; border-radius: 5px; font-weight: 500; font-size: 14px; color: var(--text-color); background-color: var(--primary-color); border: none; cursor: pointer; transition: background-color 0.2s ease; }
-.botao:hover { background-color: #008c9e; }
-.botao-amarelo { background-color: var(--attention-color); }
-.botao-amarelo:hover { background-color: #c7913a; }
-.botao-vermelho { background-color: var(--error-color); }
-.botao-vermelho:hover { background-color: #b22d3d; }
-
-.error-log-container { background-color: #111; padding: 15px; border-radius: 8px; margin-top: 15px; }
-.error-log-container h2 { color: var(--warning-color); font-size: 16px; margin-top: 0; }
-.error-log-container code { white-space: pre-wrap; display: block; font-family: monospace; color: #ccc; font-size: 12px; }
-
-.footer { text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--card-color); color: var(--secondary-color); font-size: 12px; }
-
-/* --- NOVO: ESTILO PARA O AVISO DE INATIVIDADE --- */
-.inactivity-warning {
-    background-color: var(--error-color); /* Fundo vermelho para alerta */
-    color: white;
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 25px;
-    text-align: center;
-    box-shadow: 0 4px 8px var(--shadow-color);
+.summary-icon { 
+    width: 60px; height: 60px; 
+    fill: var(--primary-color); 
+    filter: drop-shadow(0 0 8px var(--primary-color));
 }
 
-.inactivity-warning h2 {
-    color: white;
-    margin: 0 0 10px 0;
-    font-size: 20px;
-    font-weight: 700;
-}
-
-.warning-gif {
-    max-width: 150px; /* Tamanho razoável para o GIF */
-    height: auto;
-    border-radius: 8px;
-    margin-bottom: 15px;
-}
-
-.inactivity-warning p {
-    margin: 5px 0;
-    font-size: 16px;
-    font-weight: 300;
-}
-
-.inactivity-warning .small-text {
-    font-size: 12px;
-    opacity: 0.8;
+.summary-text { 
+    font-size: 26px; 
+    font-weight: 700; 
+    color: #fff; 
     margin-top: 10px;
+    text-shadow: 0 0 5px rgba(255,255,255,0.2);
 }
 
-/* Efeito de esmaecer e desabilitar cliques no restante do dashboard */
-body.inactivity-warning-active .grid-container,
-body.inactivity-warning-active .summary-card:not(#inactivity-message) {
-    opacity: 0.3;
-    pointer-events: none; 
-    transition: opacity 0.5s ease;
+.grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin-bottom: 20px; }
+
+.card { 
+    border-radius: 12px; 
+    padding: 22px 15px; 
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
 }
 
-/* Garante que o aviso não seja afetado pelo escurecimento */
-body.inactivity-warning-active .inactivity-warning {
-    opacity: 1;
-    pointer-events: all;
-    transition: opacity 0.5s ease;
+.card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 20px var(--shadow-color);
 }
-/* FIM: NOVO ESTILO PARA O AVISO DE INATIVIDADE */
 
+.card .card-icon { 
+    width: 38px; height: 38px; 
+    fill: var(--primary-color); 
+    margin-bottom: 12px; 
+    filter: drop-shadow(0 0 5px var(--primary-color));
+}
+
+.card h3 { 
+    margin: 0 0 8px 0; 
+    color: var(--secondary-color); 
+    font-weight: 600; 
+    font-size: 12px; 
+    letter-spacing: 1px;
+}
+
+.card .value { 
+    font-size: 30px; 
+    font-weight: 800; 
+    color: #fff; 
+    font-family: 'JetBrains Mono', monospace; /* Fonte mono para números dá ar tech */
+}
+
+/* --- EXPANSÃO E DETALHES --- */
+
+.card-content {
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.card.expanded {
+    background: rgba(30, 35, 50, 0.95);
+    border-color: var(--accent-color);
+}
+
+.card.expanded .card-grip-icon {
+    color: var(--accent-color);
+    filter: drop-shadow(0 0 5px var(--accent-color));
+}
+
+/* --- STATUS DO SISTEMA --- */
+
+.system-status-card { 
+    background: rgba(10, 12, 18, 0.9);
+    border: 1px solid #222;
+}
+
+.status-item .value {
+    text-shadow: 0 0 10px currentColor; /* Faz o status brilhar na cor dele */
+}
+
+.value.ok { color: var(--success-color) !important; }
+.value.attention { color: var(--warning-color) !important; }
+.value.error { color: var(--error-color) !important; }
+
+/* --- BOTÕES --- */
+
+.botao {
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    border: none;
+    box-shadow: 0 4px 15px rgba(112, 0, 255, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    transition: 0.3s;
+}
+
+.botao:hover {
+    filter: brightness(1.2);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+}
+
+/* --- AVISO DE INATIVIDADE (ESTILO GLITCH/ALERTA) --- */
+
+.inactivity-warning {
+    background: linear-gradient(45deg, #6b0000, var(--error-color));
+    border: 2px solid #fff;
+    box-shadow: 0 0 30px rgba(255, 0, 85, 0.6);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.error-log-container {
+    background-color: #000;
+    border-left: 3px solid var(--error-color);
+    box-shadow: inset 0 0 10px rgba(255,0,0,0.2);
+}
+
+/* Responsividade */
 @media (max-width: 600px) {
-    .summary-card .card-header { flex-direction: column; gap: 10px; }
-    .summary-text { font-size: 20px; }
-    .summary-icon { width: 50px; height: 50px; }
-    .summary-card .card-grip-icon { top: 8px; right: 8px; width: 18px; height: 18px; }
-    .grid-container { grid-template-columns: 1fr 1fr; gap: 10px; }
-    .card { padding: 15px 10px; }
-    .card .value { font-size: 22px; }
-    .card .value span { font-size: 12px; }
-    .card h3 { font-size: 12px; }
-    .status-grid { grid-template-columns: 1fr 1fr; }
-    .botoes { justify-content: space-around; }
-    .botao { width: 45%; text-align: center; }
+    .grid-container { grid-template-columns: 1fr 1fr; }
+    .card .value { font-size: 24px; }
 }
