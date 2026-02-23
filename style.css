@@ -1,5 +1,5 @@
-/* DASHBOARD METEOROLÓGICO - TEMA QUARESMA (VERSÃO CINZAS INTENSAS)
-   AS CINZAS AGORA FICAM ACIMA DE TODOS OS ÍCONES
+/* DASHBOARD METEOROLÓGICO - TEMA QUARESMA (VERSÃO CINZAS EXTREMAS)
+   FOCO: ALTA DENSIDADE DE PARTÍCULAS SOBREPOSTAS
 */
 
 :root {
@@ -8,13 +8,13 @@
     --text-color: #d1cbd6;
     --primary-color: #7b3f6b; /* Roxo Litúrgico */
     --secondary-color: #88808d; /* Cor de Cinzas */
-    --shadow-color: rgba(0, 0, 0, 0.7);
+    --shadow-color: rgba(0, 0, 0, 0.8);
     
-    /* Status Muted */
-    --success-color: #436d45; 
-    --warning-color: #a67c37;
-    --error-color: #8b3a3a;
-    --attention-color: #a67c37;
+    /* Status Muted (Sóbrios) */
+    --success-color: #3e5c40; 
+    --warning-color: #8a652d;
+    --error-color: #722f2f;
+    --attention-color: #8a652d;
 }
 
 html {
@@ -35,28 +35,35 @@ body {
     overflow-x: hidden;
 }
 
-/* --- CAMADA DE CINZAS INTENSAS (POR CIMA DE TUDO) --- */
+/* --- CAMADA DE CINZAS INTENSAS --- */
 body::after {
     content: "";
     position: fixed;
-    top: 0; left: 0; 
-    width: 100%; height: 100%;
-    /* Múltiplas camadas de cinzas para maior densidade */
+    top: -100px; left: 0; 
+    width: 100%; height: 120%;
+    /* 8 camadas de partículas para densidade máxima */
     background-image: 
-        radial-gradient(circle, var(--secondary-color) 1.2px, transparent 1.2px),
-        radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px),
+        radial-gradient(circle, var(--secondary-color) 1.5px, transparent 1.5px),
+        radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px),
         radial-gradient(circle, var(--secondary-color) 0.8px, transparent 0.8px),
-        radial-gradient(circle, rgba(123, 63, 107, 0.2) 1.5px, transparent 1.5px);
-    background-size: 100px 100px, 150px 150px, 80px 80px, 200px 200px;
-    animation: particles 15s linear infinite;
-    opacity: 0.5; /* Opacidade aumentada */
-    z-index: 9999; /* ACIMA DE TODOS OS ÍCONES E TEXTOS */
-    pointer-events: none; /* PERMITE CLICAR NOS CARDS POR BAIXO */
+        radial-gradient(circle, rgba(123, 63, 107, 0.3) 2px, transparent 2px),
+        radial-gradient(circle, var(--secondary-color) 1px, transparent 1px),
+        radial-gradient(circle, rgba(255,255,255,0.05) 2.5px, transparent 2.5px),
+        radial-gradient(circle, var(--secondary-color) 1.2px, transparent 1.2px),
+        radial-gradient(circle, rgba(123, 63, 107, 0.1) 1px, transparent 1px);
+    
+    /* Tamanhos variados para evitar padrões repetitivos óbvios */
+    background-size: 110px 110px, 180px 180px, 70px 70px, 220px 220px, 150px 150px, 300px 300px, 90px 90px, 250px 250px;
+    
+    animation: ashes-storm 12s linear infinite;
+    opacity: 0.65; /* Bem visível */
+    z-index: 9999; 
+    pointer-events: none;
 }
 
-@keyframes particles {
-    0% { background-position: 0 0, 0 0, 0 0, 0 0; }
-    100% { background-position: 50px 1000px, -30px 1000px, 20px 1000px, 80px 1000px; }
+@keyframes ashes-storm {
+    0% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0; }
+    100% { background-position: 60px 1000px, -40px 1000px, 30px 1000px, 100px 1000px, -20px 1000px, 150px 1000px, 45px 1000px, -80px 1000px; }
 }
 
 /* --- ESTRUTURA DO DASHBOARD --- */
@@ -78,18 +85,15 @@ header h1 {
     text-transform: uppercase; 
 }
 
+/* --- CARDS --- */
 .summary-card { 
     background-color: var(--card-color); 
     border-radius: 12px; 
     padding: 20px; 
     text-align: center; 
     margin-bottom: 20px; 
-    position: relative; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center;
     border: 1px solid rgba(123, 63, 107, 0.15);
-    box-shadow: 0 10px 20px var(--shadow-color);
+    box-shadow: 0 10px 25px var(--shadow-color);
 }
 
 .summary-icon { width: 55px; height: 55px; fill: var(--primary-color); }
@@ -109,35 +113,31 @@ header h1 {
     padding: 18px 12px; 
     text-align: center; 
     transition: all 0.3s ease; 
-    position: relative; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
     border: 1px solid rgba(255, 255, 255, 0.03);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.4);
 }
 
 .card:hover { border-color: var(--primary-color); background-color: #201d25; }
-
 .card .card-icon { width: 32px; height: 32px; fill: var(--primary-color); margin-bottom: 8px; }
 .card h3 { margin: 0 0 6px 0; color: var(--secondary-color); font-weight: 400; font-size: 11px; text-transform: uppercase; }
 .card .value { font-size: 22px; font-weight: 700; color: var(--text-color); }
 .card .value span { font-size: 13px; color: var(--secondary-color); }
 
-/* EXPANSÃO */
+/* LÓGICA DE EXPANSÃO */
 .card-grip-icon { position: absolute; bottom: 8px; right: 10px; width: 16px; height: 16px; color: var(--primary-color); opacity: 0.3; }
 .card-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; width: 100%; font-size: 0.85rem; color: var(--secondary-color); text-align: left; }
-.card.expanded .card-content { max-height: 150px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(123, 63, 107, 0.2); }
+.card.expanded .card-content { max-height: 180px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(123, 63, 107, 0.2); }
 .card.expanded .card-grip-icon { transform: rotate(135deg); opacity: 0.8; }
 
-/* INATIVIDADE */
+/* AVISO DE INATIVIDADE */
 .inactivity-warning {
     background-color: #2a1515; border: 1px solid var(--error-color);
     padding: 20px; border-radius: 10px; margin-bottom: 25px;
 }
-.warning-gif { max-width: 130px; filter: grayscale(1); margin-bottom: 15px; }
+.warning-gif { max-width: 130px; filter: grayscale(1) brightness(0.7); margin-bottom: 15px; }
 
-/* STATUS */
-.system-status-card { grid-column: 1 / -1; background-color: var(--card-color); border-radius: 10px; padding: 15px; }
+/* SISTEMA E RODAPÉ */
+.system-status-card { grid-column: 1 / -1; background-color: var(--card-color); border-radius: 10px; padding: 15px; border: 1px solid #222; }
 .status-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 
 .value.ok { color: var(--success-color) !important; }
