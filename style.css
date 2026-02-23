@@ -1,202 +1,144 @@
 :root {
-    /* Paleta Tecnológica Vibrante */
-    --bg-color: #05060a; /* Fundo "Deep Space" */
-    --card-color: rgba(20, 22, 32, 0.8); /* Efeito de vidro escuro */
-    --text-color: #ffffff; 
-    --primary-color: #00f2ff; /* Azul Elétrico / Neon Cyan */
-    --accent-color: #7000ff;  /* Roxo Neon */
-    --secondary-color: #94a3b8; /* Cinza azulado metálico */
-    --shadow-color: rgba(0, 242, 255, 0.15);
+    /* Paleta Natalina Clássica */
+    --bg-color: #0a1f14; /* Verde Pinheiro Profundo */
+    --card-color: rgba(255, 255, 255, 0.08); /* Vidro congelado */
+    --text-color: #f8f9fa; 
+    --primary-color: #d42426; /* Vermelho Papai Noel */
+    --accent-color: #ffca28;  /* Dourado Estrela */
+    --secondary-color: #a8b9b0; /* Cinza esverdeado (nevoeiro) */
+    --shadow-color: rgba(212, 36, 38, 0.2);
     
-    /* Cores de Status Vibrantes */
-    --success-color: #39ff14; /* Verde Neon */
-    --warning-color: #ffea00; /* Amarelo Elétrico */
-    --error-color: #ff0055;   /* Rosa Choque / Vermelho Cyber */
-    --attention-color: #ff9d00;
+    /* Cores de Status */
+    --success-color: #43a047; /* Verde Esperança */
+    --warning-color: #ffb300; /* Dourado Alerta */
+    --error-color: #b71c1c;   /* Vermelho Escuro */
+    --attention-color: #fb8c00;
 }
 
 body {
-    font-family: 'Inter', 'Roboto', sans-serif; /* Inter é mais moderna */
-    background: radial-gradient(circle at top right, #0d1117, #05060a);
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    /* Gradiente que simula uma noite de inverno */
+    background: radial-gradient(circle at center, #1a4731, #0a1f14);
     color: var(--text-color);
     margin: 0;
     padding: 15px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
     min-height: 100vh;
-    box-sizing: border-box;
 }
 
-.container { width: 100%; max-width: 850px; }
-
+/* --- EFEITO DE NEVE NO TOPO --- */
 header { 
     text-align: center; 
-    margin-bottom: 25px; 
-    border-bottom: 2px solid;
-    border-image: linear-gradient(to right, transparent, var(--primary-color), transparent) 1;
-    padding-bottom: 15px; 
+    margin-bottom: 30px; 
+    border-bottom: 3px dotted var(--accent-color);
+    padding-bottom: 20px;
+    position: relative;
 }
 
 header h1 { 
     margin: 0; 
-    color: var(--primary-color); 
-    font-weight: 700; 
-    font-size: 26px; 
-    letter-spacing: 3px; 
+    color: #fff; 
+    font-weight: 800; 
+    font-size: 28px; 
+    letter-spacing: 2px; 
     text-transform: uppercase;
-    text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 15px var(--primary-color);
 }
 
-/* --- CARDS COM EFEITO TECNOLÓGICO --- */
+header::before {
+    content: "❄ ❄ ❄";
+    color: white;
+    font-size: 20px;
+    display: block;
+    margin-bottom: 10px;
+    opacity: 0.8;
+}
+
+/* --- CARDS "FROSTED GLASS" (GELO) --- */
 
 .summary-card, .card {
     background: var(--card-color);
-    backdrop-filter: blur(10px); /* Efeito de vidro */
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
-    position: relative;
-    overflow: hidden;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
 }
 
-/* Linha de brilho no topo do card */
-.card::before {
+/* Simulação de um pouco de neve acumulada no topo dos cards */
+.card::after {
     content: "";
     position: absolute;
-    top: 0; left: 0; width: 100%; height: 2px;
-    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
-}
-
-.summary-card { 
-    border-radius: 15px; 
-    padding: 25px; 
-    text-align: center; 
-    margin-bottom: 25px; 
-    border: 1px solid rgba(0, 242, 255, 0.3);
+    top: 0; left: 10%; width: 80%; height: 3px;
+    background: white;
+    border-radius: 0 0 5px 5px;
+    filter: blur(1px);
+    opacity: 0.6;
 }
 
 .summary-icon { 
-    width: 60px; height: 60px; 
-    fill: var(--primary-color); 
-    filter: drop-shadow(0 0 8px var(--primary-color));
-}
-
-.summary-text { 
-    font-size: 26px; 
-    font-weight: 700; 
-    color: #fff; 
-    margin-top: 10px;
-    text-shadow: 0 0 5px rgba(255,255,255,0.2);
-}
-
-.grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin-bottom: 20px; }
-
-.card { 
-    border-radius: 12px; 
-    padding: 22px 15px; 
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+    fill: var(--accent-color); 
+    filter: drop-shadow(0 0 8px rgba(255, 202, 40, 0.6));
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    border-color: var(--primary-color);
-    box-shadow: 0 0 20px var(--shadow-color);
+    transform: scale(1.03);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 20px rgba(255, 202, 40, 0.3);
 }
 
 .card .card-icon { 
-    width: 38px; height: 38px; 
     fill: var(--primary-color); 
-    margin-bottom: 12px; 
-    filter: drop-shadow(0 0 5px var(--primary-color));
-}
-
-.card h3 { 
-    margin: 0 0 8px 0; 
-    color: var(--secondary-color); 
-    font-weight: 600; 
-    font-size: 12px; 
-    letter-spacing: 1px;
+    filter: drop-shadow(0 0 5px rgba(212, 36, 38, 0.4));
 }
 
 .card .value { 
-    font-size: 30px; 
-    font-weight: 800; 
     color: #fff; 
-    font-family: 'JetBrains Mono', monospace; /* Fonte mono para números dá ar tech */
+    text-shadow: 0 0 10px rgba(255,255,255,0.3);
 }
 
-/* --- EXPANSÃO E DETALHES --- */
-
-.card-content {
-    border-top: 1px solid rgba(255,255,255,0.05);
-}
-
-.card.expanded {
-    background: rgba(30, 35, 50, 0.95);
-    border-color: var(--accent-color);
-}
-
-.card.expanded .card-grip-icon {
-    color: var(--accent-color);
-    filter: drop-shadow(0 0 5px var(--accent-color));
-}
-
-/* --- STATUS DO SISTEMA --- */
-
-.system-status-card { 
-    background: rgba(10, 12, 18, 0.9);
-    border: 1px solid #222;
-}
-
-.status-item .value {
-    text-shadow: 0 0 10px currentColor; /* Faz o status brilhar na cor dele */
-}
-
-.value.ok { color: var(--success-color) !important; }
-.value.attention { color: var(--warning-color) !important; }
-.value.error { color: var(--error-color) !important; }
-
-/* --- BOTÕES --- */
+/* --- BOTÕES (COMO PRESENTES) --- */
 
 .botao {
-    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-    border: none;
-    box-shadow: 0 4px 15px rgba(112, 0, 255, 0.3);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 700;
-    transition: 0.3s;
+    background: linear-gradient(135deg, var(--primary-color), #8b0000);
+    border: 1px solid var(--accent-color);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    border-radius: 8px;
+    transition: 0.3s ease;
 }
 
 .botao:hover {
     filter: brightness(1.2);
-    transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+    box-shadow: 0 0 15px var(--primary-color);
 }
 
-/* --- AVISO DE INATIVIDADE (ESTILO GLITCH/ALERTA) --- */
+.botao-amarelo { background: linear-gradient(135deg, #fbc02d, #f57f17); }
+.botao-vermelho { background: linear-gradient(135deg, #d32f2f, #7b1fa2); }
+
+/* --- AVISO DE INATIVIDADE (O GRINCH ATACA!) --- */
 
 .inactivity-warning {
-    background: linear-gradient(45deg, #6b0000, var(--error-color));
-    border: 2px solid #fff;
-    box-shadow: 0 0 30px rgba(255, 0, 85, 0.6);
-    animation: pulse 2s infinite;
+    background: linear-gradient(45deg, #1b5e20, #2e7d32);
+    border: 3px dashed var(--accent-color);
+    color: white;
 }
 
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.02); }
-    100% { transform: scale(1); }
+.inactivity-warning h2 {
+    text-shadow: 0 0 10px var(--accent-color);
 }
 
-.error-log-container {
-    background-color: #000;
-    border-left: 3px solid var(--error-color);
-    box-shadow: inset 0 0 10px rgba(255,0,0,0.2);
+/* Rodapé */
+.footer {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    color: var(--secondary-color);
+    font-style: italic;
 }
 
-/* Responsividade */
-@media (max-width: 600px) {
-    .grid-container { grid-template-columns: 1fr 1fr; }
-    .card .value { font-size: 24px; }
+/* --- DETALHE DO GRIP (TRANSFORMADO EM ESTRELA) --- */
+.card-grip-icon {
+    opacity: 0.6;
+    color: var(--accent-color);
+}
+
+.card.expanded .card-grip-icon {
+    transform: rotate(180deg);
+    color: #fff;
 }
