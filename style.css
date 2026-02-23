@@ -1,45 +1,31 @@
-/* TEMA: QUARESMA (SOBRIEDADE E REFLEXÃO)
-   ESTRUTURA: BASEADA NO DASHBOARD ORIGINAL
+/* DASHBOARD METEOROLÓGICO - TEMA QUARESMA
+   ESTILO: SOBRIEDADE, REFLEXÃO E CINZAS
+   OTIMIZADO PARA: DESKTOP E MOBILE (2 COLUNAS)
 */
 
 :root {
-    --bg-color: #0f0d11; /* Fundo "Noite de Vigília" */
-    --card-color: #1a171e; /* Cinza-roxo profundo */
-    --text-color: #d1cbd6; /* Branco acinzentado */
-    --primary-color: #7b3f6b; /* Roxo Litúrgico Sóbrio */
-    --secondary-color: #88808d; /* Cor de Cinzas */
-    --shadow-color: rgba(0, 0, 0, 0.6);
+    /* Paleta Quaresma Sóbria */
+    --bg-color: #0f0d11;       /* Fundo profundo */
+    --card-color: #1a171e;     /* Cinza-arroxeado */
+    --text-color: #d1cbd6;     /* Branco "cinzas" */
+    --primary-color: #7b3f6b;  /* Roxo Litúrgico */
+    --secondary-color: #88808d;/* Cinza das cinzas */
+    --shadow-color: rgba(0, 0, 0, 0.7);
     
-    /* Status Muted (Cores menos vibrantes para respeitar o tema) */
+    /* Status Muted (Cores menos saturadas) */
     --success-color: #436d45; 
     --warning-color: #a67c37;
     --error-color: #8b3a3a;
     --attention-color: #a67c37;
 }
 
-/* --- EFEITO DE CINZAS FLUTUANTES NO FUNDO --- */
-body::before {
-    content: "";
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background-image: 
-        radial-gradient(circle, var(--secondary-color) 1px, transparent 1px),
-        radial-gradient(circle, #444 1px, transparent 1px);
-    background-size: 80px 80px, 150px 150px;
-    animation: particles 20s linear infinite;
-    opacity: 0.15;
-    z-index: -1;
-    pointer-events: none;
-}
-
-@keyframes particles {
-    0% { background-position: 0 0; }
-    100% { background-position: 50px 1000px; }
+/* --- CAMADA DE FUNDO PARA AS CINZAS --- */
+html {
+    background-color: var(--bg-color);
 }
 
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: var(--bg-color);
     color: var(--text-color);
     margin: 0;
     padding: 15px;
@@ -48,8 +34,32 @@ body {
     align-items: flex-start;
     min-height: 100vh;
     box-sizing: border-box;
+    background-color: transparent;
+    position: relative;
+    overflow-x: hidden;
 }
 
+/* Efeito de Cinzas Flutuantes */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: 
+        radial-gradient(circle, var(--secondary-color) 1.2px, transparent 1.2px),
+        radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 120px 120px, 250px 250px;
+    animation: particles 30s linear infinite;
+    opacity: 0.35;
+    z-index: -1;
+    pointer-events: none;
+}
+
+@keyframes particles {
+    0% { background-position: 0 0; }
+    100% { background-position: 80px 1000px; }
+}
+
+/* --- ESTRUTURA --- */
 .container { width: 100%; max-width: 850px; }
 
 header { 
@@ -68,7 +78,7 @@ header h1 {
     text-transform: uppercase; 
 }
 
-/* CARD DE SUMÁRIO */
+/* --- CARD DE SUMÁRIO --- */
 .summary-card { 
     background-color: var(--card-color); 
     border-radius: 12px; 
@@ -80,19 +90,15 @@ header h1 {
     display: flex; 
     flex-direction: column; 
     align-items: center;
-    border: 1px solid rgba(123, 63, 107, 0.2);
-    box-shadow: 0 4px 15px var(--shadow-color);
+    border: 1px solid rgba(123, 63, 107, 0.15);
+    box-shadow: 0 10px 20px var(--shadow-color);
 }
 
-.summary-icon { 
-    width: 55px; height: 55px; 
-    fill: var(--primary-color); 
-    filter: drop-shadow(0 0 5px rgba(123, 63, 107, 0.3));
-}
-
+.summary-card .card-header { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 20px; width: 100%; }
+.summary-icon { width: 55px; height: 55px; fill: var(--primary-color); }
 .summary-text { font-size: 22px; font-weight: 300; margin-top: 10px; color: var(--text-color); }
 
-/* GRID ADAPTADO PARA CELULAR (2 COLUNAS) */
+/* --- GRID MOBILE-FIRST (2 COLUNAS) --- */
 .grid-container { 
     display: grid; 
     grid-template-columns: repeat(2, 1fr); 
@@ -100,11 +106,11 @@ header h1 {
     margin-bottom: 20px; 
 }
 
-/* CARDS INDIVIDUAIS */
+/* --- CARDS DE DADOS --- */
 .card { 
     background-color: var(--card-color); 
     border-radius: 10px; 
-    padding: 18px 10px; 
+    padding: 18px 12px; 
     text-align: center; 
     transition: all 0.3s ease; 
     position: relative; 
@@ -112,58 +118,71 @@ header h1 {
     display: flex; 
     flex-direction: column; 
     align-items: center; 
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
 .card:hover {
     border-color: var(--primary-color);
-    background-color: #211e26;
+    background-color: #201d25;
+    transform: translateY(-2px);
 }
 
 .card .card-icon { width: 32px; height: 32px; fill: var(--primary-color); margin-bottom: 8px; }
 .card h3 { margin: 0 0 6px 0; color: var(--secondary-color); font-weight: 400; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
-.card .value { font-size: 24px; font-weight: 700; color: var(--text-color); }
-.card .value span { font-size: 14px; font-weight: 300; color: var(--secondary-color); }
+.card .value { font-size: 22px; font-weight: 700; color: var(--text-color); }
+.card .value span { font-size: 13px; font-weight: 300; color: var(--secondary-color); }
 
-/* EXPANSÃO */
+/* --- LÓGICA DE EXPANSÃO --- */
+.card .card-header { display: flex; flex-direction: column; align-items: center; width: 100%; }
+
 .card-grip-icon {
-    position: absolute; bottom: 6px; right: 10px; width: 16px; height: 16px;
-    color: var(--primary-color); opacity: 0.4;
+    position: absolute; bottom: 8px; right: 10px; width: 16px; height: 16px;
+    color: var(--primary-color); opacity: 0.3; transition: all 0.3s ease;
 }
 
 .card-content {
     max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; width: 100%;
-    font-size: 0.85rem; color: var(--secondary-color); text-align: left;
+    font-size: 0.85rem; color: var(--secondary-color); line-height: 1.4; text-align: left;
 }
 
 .card.expanded .card-content {
-    max-height: 200px; margin-top: 12px; padding-top: 12px;
+    max-height: 150px; margin-top: 12px; padding-top: 12px;
     border-top: 1px solid rgba(123, 63, 107, 0.2);
 }
 
-.card.expanded .card-grip-icon { transform: rotate(135deg); opacity: 1; }
+.card.expanded .card-grip-icon { transform: rotate(135deg); opacity: 0.8; }
 
-/* AVISO DE INATIVIDADE */
+/* --- AVISO DE INATIVIDADE (SÓBRIO) --- */
 .inactivity-warning {
     background-color: #2a1515;
     border: 1px solid var(--error-color);
-    padding: 20px; border-radius: 10px; margin-bottom: 20px; text-align: center;
+    color: var(--text-color);
+    padding: 20px; border-radius: 10px; margin-bottom: 25px; text-align: center;
 }
-.inactivity-warning h2 { color: #d68d8d; font-size: 18px; margin: 0; }
-.warning-gif { max-width: 120px; filter: grayscale(100%) sepia(50%) hue-rotate(310deg); margin-bottom: 10px; }
+.inactivity-warning h2 { color: #d68d8d; font-size: 18px; margin-top: 0; }
+.warning-gif { max-width: 130px; filter: grayscale(1) opacity(0.7); margin-bottom: 15px; }
 
-/* STATUS DO SISTEMA */
+/* --- STATUS DO SISTEMA --- */
 .system-status-card { grid-column: 1 / -1; background-color: var(--card-color); border-radius: 10px; padding: 15px; border: 1px solid #222; }
-.status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.status-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; text-align: center; }
+.status-item h3 { font-size: 11px; color: var(--secondary-color); margin: 0; }
+.status-item .value { font-size: 16px; }
 
+.value.ok { color: var(--success-color) !important; }
+.value.attention { color: var(--warning-color) !important; }
+.value.error { color: var(--error-color) !important; }
+
+/* --- RODAPÉ --- */
 .footer { 
-    text-align: center; margin-top: 25px; padding-top: 15px; 
+    text-align: center; margin-top: 30px; padding-top: 15px; 
     border-top: 1px solid rgba(123, 63, 107, 0.2); 
     color: var(--secondary-color); font-size: 11px; 
 }
 
-/* AJUSTES PARA DESKTOP */
+/* --- AJUSTES PARA DESKTOP --- */
 @media (min-width: 601px) {
-    .grid-container { grid-template-columns: repeat(3, 1fr); }
+    .grid-container { grid-template-columns: repeat(3, 1fr); gap: 15px; }
     .card .value { font-size: 28px; }
+    .status-grid { grid-template-columns: repeat(4, 1fr); }
 }
