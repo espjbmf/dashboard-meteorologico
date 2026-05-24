@@ -30,10 +30,11 @@
             <div class="warning-content">
                 <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMjU5ZDBkY2V6M3R2bHhncWV6azN0a3pjeGc5Z3c3Z2F1a201Z2JvNSZlcD12MV9pbnRlcm5hbF9naWYmY3Q9cw/8L0Ea2K7f4jB1g0XFp/giphy.gif" alt="Problema Técnico" class="warning-gif">
                 <h2>⚠️ Desculpe, estamos enfrentando problemas técnicos.</h2>
-                <p>A estação meteorológica não enviou novos dados nas últimas 60 minutos.</p>
+                <p id="inactivity-text">A estação meteorológica não enviou novos dados recentemente.</p>
                 <p class="small-text" id="data-hora-inactivity">--</p>
             </div>
         </div>
+
         <div class='card summary-card' id="card-sumario">
             <div class="card-header">
                 <div class='summary-icon' id='summary-icon'>
@@ -41,7 +42,7 @@
                 </div>
                 <h2 class='summary-text' id='summary-text'>Aguardando dados...</h2>
                 <div class="card-grip-icon">
-                    <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20L20 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 18L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 16L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20L20 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/><path d="M13 18L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/><path d="M11 16L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/></svg>
                 </div>
             </div>
             <div class="card-content">
@@ -57,12 +58,11 @@
                     <h3>Temp. Externa</h3>
                     <p class='value' id='temp-externa-valor'>--<span> &deg;C</span></p>
                     <div class="card-grip-icon">
-                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20L20 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 18L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 16L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20L20 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/><path d="M13 18L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/><path d="M11 16L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/></svg>
                     </div>
                 </div>
                 <div class="card-content">
-                    <p>Máxima (24h): <span id="temp-max-dia">-- &deg;C</span></p>
-                    <p>Mínima (24h): <span id="temp-min-dia">-- &deg;C</span></p>
+                    <p>💡 <strong>Curiosidade:</strong> Poços de Caldas já registrou marcas negativas congelantes no inverno! A menor temperatura oficial medida na cidade foi de <strong>-5,2 °C</strong> em julho de 1981.</p>
                 </div>
             </div>
 
@@ -72,12 +72,11 @@
                     <h3>Umidade</h3>
                     <p class='value' id='umid-valor'>--<span> %</span></p>
                     <div class="card-grip-icon">
-                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20L20 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 18L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 16L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20L20 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/><path d="M13 18L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/><path d="M11 16L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/></svg>
                     </div>
                 </div>
                 <div class="card-content">
-                    <p>Máxima (24h): <span id="umid-max-dia">-- %</span></p>
-                    <p>Mínima (24h): <span id="umid-min-dia">-- %</span></p>
+                    <p>💡 <strong>Curiosidade:</strong> Por estar no topo da Serra de São Domingos (a cerca de 1.200m de altitude), Poços frequentemente fica "dentro das nuvens", o que faz a umidade disparar no famoso nevoeiro local.</p>
                 </div>
             </div>
 
@@ -87,7 +86,7 @@
                     <h3>Ponto de Orvalho</h3>
                     <p class='value' id='ponto-orvalho-valor'>--<span> &deg;C</span></p>
                     <div class="card-grip-icon">
-                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20L20 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 18L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 16L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20L20 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/><path d="M13 18L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/><path d="M11 16L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/></svg>
                     </div>
                 </div>
                 <div class="card-content">
@@ -101,7 +100,7 @@
                     <h3>Sensação</h3>
                     <p class='value' id='sensacao-valor'>--<span> &deg;C</span></p>
                     <div class="card-grip-icon">
-                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20L20 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 18L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 16L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20L20 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/><path d="M13 18L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/><path d="M11 16L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/></svg>
                     </div>
                 </div>
                 <div class="card-content">
@@ -115,12 +114,11 @@
                     <h3>Pressão</h3>
                     <p class='value' id='pressao-valor'>--<span> hPa</span></p>
                     <div class="card-grip-icon">
-                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20L20 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 18L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 16L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20L20 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/><path d="M13 18L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/><path d="M11 16L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/></svg>
                     </div>
                 </div>
                 <div class="card-content">
-                    <p>Máxima (24h): <span id="pressao-max-dia">-- hPa</span></p>
-                    <p>Mínima (24h): <span id="pressao-min-dia">-- hPa</span></p>
+                    <p>💡 <strong>Curiosidade:</strong> A pressão atmosférica aqui é menor do que na praia! Como estamos bem altos, o ar é ligeiramente menos denso, o que faz a água ferver por volta dos 96 °C.</p>
                 </div>
             </div>
             
@@ -130,7 +128,7 @@
                     <h3>Luminosidade</h3>
                     <p class='value' id='luminosidade-valor'>--<span> Lux</span></p>
                     <div class="card-grip-icon">
-                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20L20 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 18L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 16L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20L20 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/><path d="M13 18L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/><path d="M11 16L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/></svg>
                     </div>
                 </div>
                 <div class="card-content">
@@ -144,12 +142,12 @@
                     <h3>Índice UV</h3>
                     <p class='value' id='uv-valor'>--</p>
                     <div class="card-grip-icon">
-                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20L20 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 18L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 16L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20L20 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/><path d="M13 18L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/><path d="M11 16L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/></svg>
                     </div>
                 </div>
                 <div class="card-content">
-                    <p id="uv-max-dia-label">Máxima (24h): <span id="uv-max-dia">--</span></p>
-                    <p id="uv-descricao">Nível de radiação ultravioleta.</p>
+                    <p id="uv-descricao" style="margin-bottom: 8px;">Nível de radiação ultravioleta.</p>
+                    <p>💡 <strong>Efeito Altitude:</strong> Em Poços, a radiação UV aumenta cerca de 10% a 12% em comparação com cidades ao nível do mar, pois há menos atmosfera para filtrar o Sol.</p>
                 </div>
             </div>
             
@@ -159,7 +157,7 @@
                     <h3>Potencial Eólico</h3>
                     <p class='value' id='potencial-eolico-valor' style="font-size: 24px;">--</p>
                     <div class="card-grip-icon">
-                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20L20 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 18L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 16L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20L20 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/><path d="M13 18L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/><path d="M11 16L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/></svg>
                     </div>
                 </div>
                 <div class="card-content">
@@ -173,11 +171,11 @@
                     <h3>Vel. Vento</h3>
                     <p class='value' id='vento-valor'>--<span> km/h</span></p>
                     <div class="card-grip-icon">
-                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20L20 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 18L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 16L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20L20 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/><path d="M13 18L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/><path d="M11 16L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/></svg>
                     </div>
                 </div>
                 <div class="card-content">
-                    <p>Máxima (24h): <span id="vento-max-dia">-- km/h</span></p>
+                    <p>💡 <strong>Curiosidade:</strong> Os ventos mais fortes no Sul de Minas costumam acontecer entre agosto e setembro, causados pela transição rigorosa para a primavera.</p>
                 </div>
             </div>
 
@@ -187,7 +185,7 @@
                     <h3>Dir. Vento</h3>
                     <p class='value' id='dir-vento-valor'>--</p>
                     <div class="card-grip-icon">
-                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20L20 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 18L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 16L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 20L20 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/><path d="M13 18L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/><path d="M11 16L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linecap="round"/></svg>
                     </div>
                 </div>
                 <div class="card-content">
@@ -195,7 +193,7 @@
                 </div>
             </div>
 
-        </main>
+         </main>
         
         <footer class='footer'><p id='data-hora'>--</p></footer>
     </div>
